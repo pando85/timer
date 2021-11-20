@@ -1,0 +1,17 @@
+[package]
+name = "timer_core"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "timer"
+path = "src/main.rs"
+
+[dependencies]
+crossterm = "0.22.1"
+tui = { version = "0.16", default-features = false, features = ['crossterm'] }
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false # Disable features which are enabled by default
+features = ["user-hooks"]
