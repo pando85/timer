@@ -3,13 +3,16 @@ name = "timer_core"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "timer_core"
+path = "src/lib.rs"
+
 [[bin]]
 name = "timer"
 path = "src/main.rs"
 
 [dependencies]
-crossterm = "0.22.1"
-tui = { version = "0.16", default-features = false, features = ['crossterm'] }
+crossterm = { version = "0.22.1", features = ["event-stream"] }
 
 [dev-dependencies.cargo-husky]
 version = "1"
