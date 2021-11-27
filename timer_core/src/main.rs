@@ -1,10 +1,6 @@
-//! Demonstrates how to read events asynchronously with tokio.
-//!
-//! cargo run --features="event-stream" --example event-stream-tokio
-
 use std::io;
-use std::time::{Duration, SystemTime};
 use std::thread::sleep;
+use std::time::{Duration, SystemTime};
 
 use crossterm::cursor;
 use crossterm::execute;
@@ -12,29 +8,23 @@ use crossterm::style;
 use crossterm::terminal;
 use crossterm::Result;
 
-
-fn print_events<W>(w: &mut W) -> Result<()>
+fn countdown<W>(w: &mut W, end: SystemTime) -> Result<()>
 where
     W: io::Write,
 {
-    execute!(w, terminal::EnterAlternateScreen)?;
-
-    let now = SystemTime::now();
-    let total = Duration::from_secs(10);
-
-    loop {
-        sleep(Duration::from_secs(1));
-
-        let elapsed_time = now.elapsed().unwrap();
-        let counter = total.saturating_sub(elapsed_time);
-        draw(w, counter)?;
-        if counter.is_zero() {
+    match end.duration_since(SystemTime::now()) {
+        Ok(counter) => {
+            draw(w, counter)?;
+            sleep(Duration::from_secs(1));
+            countdown(w, end)
+        }
+        Err(_) => {
+            draw(w, Duration::ZERO)?;
             sleep(Duration::from_secs(5));
-            return Ok(());
+            Ok(())
         }
     }
 }
-
 
 fn draw<W>(w: &mut W, counter: Duration) -> Result<()>
 where
@@ -50,21 +40,38 @@ where
     Ok(())
 }
 
-fn main() -> Result<()> {
-    let mut stdout = io::stdout();
+fn set_up_terminal<W>(w: &mut W) -> Result<()>
+where
+    W: io::Write,
+{
+    execute!(w, terminal::EnterAlternateScreen)
+}
 
-    let res = print_events(&mut stdout);
-
+fn restore_terminal<W>(w: &mut W) -> Result<()>
+where
+    W: io::Write,
+{
     execute!(
-        stdout,
+        w,
         style::ResetColor,
         cursor::Show,
         terminal::LeaveAlternateScreen
-    )?;
+    )
+}
+
+fn main() {
+    let mut stdout = io::stdout();
+
+    set_up_terminal(&mut stdout).unwrap();
+
+    let now = SystemTime::now();
+    let counter = Duration::from_secs(10);
+    let end = now + counter;
+    let res = countdown(&mut stdout, end);
+
+    restore_terminal(&mut stdout).unwrap();
 
     if let Err(err) = res {
         println!("{:?}", err)
     }
-
-    Ok(())
 }
