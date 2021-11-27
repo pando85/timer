@@ -1,5 +1,6 @@
 [package]
 name = "timer_core"
+description = "Simple countdown terminal alarm"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,7 +13,9 @@ name = "timer"
 path = "src/main.rs"
 
 [dependencies]
+clap = "3.0.0-beta.5"
 crossterm = "0.22.1"
+regex = "1.5"
 
 [dev-dependencies.cargo-husky]
 version = "1"
