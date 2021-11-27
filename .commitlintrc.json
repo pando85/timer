@@ -23,7 +23,7 @@
     "subject-case": [
       2,
       "always",
-      ["start-case"]
+      ["sentence-case"]
     ],
     "body-leading-blank": [
       2,
