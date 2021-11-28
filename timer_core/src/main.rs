@@ -2,7 +2,7 @@ use timer_core::timer;
 use timer_core::ui;
 
 use std::io;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 
 use clap::{crate_authors, crate_description, crate_version, Parser};
 
@@ -21,12 +21,11 @@ struct Opts {
 fn main() {
     let opts: Opts = Opts::parse();
 
-    let _counter = timer::Time::new(opts.time.as_str());
+    let counter = timer::parse_time(opts.time.as_str()).unwrap();
     let mut stdout = io::stdout();
     ui::set_up_terminal(&mut stdout).unwrap();
 
     let now = SystemTime::now();
-    let counter = Duration::from_secs(10);
     let end = now + counter;
     let res = timer::countdown(&mut stdout, end);
 
