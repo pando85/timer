@@ -1,3 +1,5 @@
+use crate::beep::beep;
+use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS};
 use crate::ui;
 
 use std::io;
@@ -61,7 +63,10 @@ where
         }
         Err(_) => {
             ui::draw(w, Duration::ZERO)?;
-            sleep(Duration::from_secs(5));
+            for _ in 0..BEEP_REPETITIONS {
+                beep(BEEP_FREQ, Duration::from_millis(BEEP_DURATION)).unwrap();
+                sleep(Duration::from_millis(BEEP_DELAY));
+            }
             Ok(())
         }
     }
