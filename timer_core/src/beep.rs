@@ -6,7 +6,6 @@ use std::time::Duration;
 
 use lazy_static::lazy_static;
 use libc::{c_void, input_event, write};
-use nix::sys::time::TimeVal;
 
 const FILE: &str = "/dev/input/by-path/platform-pcspkr-event-spkr";
 const EV_SND: u16 = 0x12;
