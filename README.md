@@ -5,3 +5,9 @@
 ![Timer license](https://img.shields.io/github/license/pando85/timer)
 
 Simple count down terminal alarm.
+
+## PC speaker
+
+Sounds from the computer can be heard from the built-in case speaker, the speakers, or headphones which are plugged into the soundcard (in which case the noise may be unexpectedly loud).
+
+If you want to use them as normal user read [`PERMISSIONS.md`](PERMISSIONS.md) file.
