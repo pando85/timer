@@ -45,14 +45,15 @@ fn main() -> Result<(), io::Error> {
         ui::restore_terminal(&mut stdout).unwrap();
     });
 
+    let mut stdout = io::stdout();
+
     for signal in signals.forever() {
         match signal {
             SIGWINCH => {
-                // resize terminal
+                timer::resize_term(&mut stdout, end)?;
             }
-            SIGTERM | SIGINT | SIGQUIT => {
-                let mut stdout = io::stdout();
 
+            SIGTERM | SIGINT | SIGQUIT => {
                 // ensure beep stops
                 beep(0, Duration::from_secs(0)).unwrap();
                 ui::restore_terminal(&mut stdout).unwrap();
