@@ -16,6 +16,7 @@ path = "src/main.rs"
 clap = "3.0.0-beta.5"
 crossterm = "0.22.1"
 regex = "1.5"
+signal-hook = "0.3"
 
 # beep
 libc = "0.2"
