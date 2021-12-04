@@ -27,7 +27,7 @@ where
     let size = terminal::size()?;
     let s = match center(size, figlet_string) {
         Some(s) => s,
-        None => counter_string,
+        None => center(size, counter_string).unwrap(),
     };
     println!("{}", s);
     Ok(())
