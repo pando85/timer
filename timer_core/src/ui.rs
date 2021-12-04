@@ -7,6 +7,8 @@ use crossterm::style;
 use crossterm::terminal;
 use crossterm::Result;
 
+use crate::figlet::Figlet;
+
 pub fn draw<W>(w: &mut W, counter: Duration) -> Result<()>
 where
     W: io::Write,
@@ -18,8 +20,12 @@ where
         cursor::MoveTo(0, 0)
     )?;
     let counter_string = time_to_string(counter);
+
+    let figlet = Figlet::default();
+    let figlet_string = figlet.convert(&counter_string);
+
     let size = terminal::size()?;
-    let s = match center(size, counter_string.clone()) {
+    let s = match center(size, figlet_string) {
         Some(s) => s,
         None => counter_string,
     };
