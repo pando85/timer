@@ -20,13 +20,15 @@ use clap::{crate_authors, crate_description, crate_version, Parser};
 )]
 struct Opts {
     /// Remaining time until the alarm sounds
-    time: String,
+    #[clap(multiple_occurrences = true, takes_value = true, number_of_values = 1)]
+    time: Vec<String>,
 }
 
 fn main() -> Result<(), io::Error> {
     let opts: Opts = Opts::parse();
 
-    let counter = timer::parse_time(opts.time.as_str()).unwrap();
+    let input_time = opts.time.join(" ");
+    let counter = timer::parse_time(input_time.as_str()).unwrap();
     let mut stdout = io::stdout();
     ui::set_up_terminal(&mut stdout).unwrap();
 
