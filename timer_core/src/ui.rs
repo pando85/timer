@@ -47,17 +47,18 @@ where
 }
 
 fn time_to_string(counter: Duration) -> String {
-    let hours = counter.as_secs() / 3600;
+    let total_s = (counter.as_millis() as f64 / 1000.).round() as u64;
+    let hours = total_s / 3600;
     let minutes = if hours == 0 {
-        counter.as_secs() / 60
+        total_s / 60
     } else {
-        (counter.as_secs() % (hours * 3600)) / 60
+        (total_s % (hours * 3600)) / 60
     };
 
     let seconds = if hours == 0 && minutes == 0 {
-        (counter.as_millis() as f64 / 1000.0).round() as u8
+        total_s as u8
     } else {
-        (counter.as_millis() as f64 / 1000.0 % (hours * 3600 + minutes * 60) as f64).round() as u8
+        (total_s % (hours * 3600 + minutes * 60)) as u8
     };
 
     if hours > 0 {
@@ -134,6 +135,14 @@ mod tests {
         assert_eq!(
             time_to_string(Duration::from_millis(4355)),
             "4s".to_string()
+        );
+        assert_eq!(
+            time_to_string(Duration::from_millis(59999)),
+            "1m 0s".to_string()
+        );
+        assert_eq!(
+            time_to_string(Duration::from_millis(7199999)),
+            "2h 0m 0s".to_string()
         );
         assert_eq!(time_to_string(Duration::from_secs(0)), "0s".to_string());
     }
