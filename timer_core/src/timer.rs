@@ -51,6 +51,16 @@ pub fn parse_time(s: &str) -> Result<Duration> {
     Ok(Duration::from_secs(total))
 }
 
+pub fn resize_term<W>(w: &mut W, end: SystemTime) -> Result<()>
+where
+    W: io::Write,
+{
+    match end.duration_since(SystemTime::now()) {
+        Ok(counter) => ui::draw(w, counter),
+        Err(_) => ui::draw(w, Duration::ZERO),
+    }
+}
+
 pub fn countdown<W>(w: &mut W, end: SystemTime) -> Result<()>
 where
     W: io::Write,
