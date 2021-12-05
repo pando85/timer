@@ -7,10 +7,9 @@ use std::process::exit;
 use std::thread;
 use std::time::Duration;
 
+use clap::{crate_authors, crate_description, crate_version, AppSettings, IntoApp, Parser};
 use signal_hook::{consts::signal::*, iterator::Signals};
 use time::OffsetDateTime;
-
-use clap::{crate_authors, crate_description, crate_version, Parser};
 
 #[derive(Parser)]
 #[clap(
@@ -18,6 +17,7 @@ use clap::{crate_authors, crate_description, crate_version, Parser};
     about = crate_description!(),
     version = crate_version!(),
     author = crate_authors!("\n"),
+    setting = AppSettings::ArgRequiredElseHelp,
 )]
 struct Opts {
     /// Remaining time until the alarm sounds
@@ -25,7 +25,7 @@ struct Opts {
     time: Vec<String>,
 }
 
-fn main() -> Result<(), io::Error> {
+fn main() {
     let opts: Opts = Opts::parse();
 
     let input_time = opts.time.join(" ");
@@ -34,40 +34,56 @@ fn main() -> Result<(), io::Error> {
             let now = OffsetDateTime::now_utc();
             now + counter
         }
-        None => timer::parse_end_time(input_time.as_str()).unwrap(),
+        None => match timer::parse_end_time(input_time.as_str()) {
+            Some(x) => x,
+            None => {
+                Opts::into_app().print_help().unwrap();
+                eprintln!(
+                    "Error: Invalid value: Unable to parse TIME value '{}'",
+                    input_time.as_str()
+                );
+                exit(1);
+            }
+        },
     };
 
     let mut stdout = io::stdout();
     ui::set_up_terminal(&mut stdout).unwrap();
 
-    thread::spawn(move || {
+    let thread_join_handle = thread::spawn(move || {
         match timer::countdown(&mut stdout, end) {
-            Ok(_) => {}
-            Err(err) => {
-                println!("{:?}", err);
+            Ok(_) => {
+                ui::restore_terminal(&mut stdout).unwrap();
+            }
+            Err(e) => {
+                ui::restore_terminal(&mut stdout).unwrap();
+                match e.kind() {
+                    io::ErrorKind::WouldBlock => eprintln!("You must have a tty to run timer"),
+                    _ => eprintln!("Error: {:?}", e),
+                }
             }
         };
-        ui::restore_terminal(&mut stdout).unwrap();
+        exit(0)
     });
 
     let mut signals = Signals::new(&[SIGWINCH, SIGTERM, SIGINT, SIGQUIT]).unwrap();
-    let mut stdout = io::stdout();
+    let mut stdout_signals_thread = io::stdout();
 
-    for signal in signals.forever() {
+    for signal in &mut signals {
         match signal {
             SIGWINCH => {
-                timer::resize_term(&mut stdout, end)?;
+                timer::resize_term(&mut stdout_signals_thread, end).unwrap();
             }
 
             SIGTERM | SIGINT | SIGQUIT => {
                 // ensure beep stops
-                beep(0, Duration::from_secs(0)).unwrap();
-                ui::restore_terminal(&mut stdout).unwrap();
+                let _ = beep(0, Duration::from_secs(0));
+                ui::restore_terminal(&mut stdout_signals_thread).unwrap();
                 exit(1);
             }
             _ => unreachable!(),
         }
     }
 
-    Ok(())
+    thread_join_handle.join().unwrap();
 }
