@@ -50,7 +50,13 @@ pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
     let format = format_description::parse("[hour]:[minute]").ok()?;
     let now = OffsetDateTime::now_local().ok()?;
     let end_time = Time::parse(s, &format).ok()?;
-    Some(now.replace_time(end_time))
+    let (h, m, s) = now.to_hms();
+    let end_date = if Time::from_hms(h, m, s).ok()? >= end_time {
+        now + Duration::days(1)
+    } else {
+        now
+    };
+    Some(end_date.replace_time(end_time))
 }
 
 pub fn resize_term<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
@@ -115,7 +121,6 @@ mod tests {
         let now = OffsetDateTime::now_local().ok().unwrap();
         let date = OffsetDateTime::from(parse_end_time("12:00").unwrap());
         let expected_date = now.replace_time(time!(12:00));
-        assert_eq!(date.to_ordinal_date(), expected_date.to_ordinal_date());
         assert_eq!(date.to_hms(), expected_date.to_hms());
     }
 }
