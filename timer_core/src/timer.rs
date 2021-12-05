@@ -4,10 +4,10 @@ use crate::ui;
 
 use std::io;
 use std::thread::sleep;
-use std::time::{Duration, SystemTime};
+use std::time::Duration as stdDuration;
 
-use time::{format_description, OffsetDateTime, Time};
 use crossterm::Result;
+use time::{format_description, Duration, OffsetDateTime, Time};
 
 use regex::{Regex, RegexSet};
 
@@ -19,7 +19,7 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
 
     // regex without `^(?!$)` must ensure of matching something
     if caps[0].is_empty() {
-        return None
+        return None;
     };
 
     let set = RegexSet::new(&[r"(\d+)h", r"(\d+)m", r"(\d+)s"]).unwrap();
@@ -42,48 +42,47 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
         0
     };
 
-    let total: u64 = (hours * 3600 + minutes * 60 + seconds).into();
-    Some(Duration::from_secs(total))
+    let total: i64 = (hours * 3600 + minutes * 60 + seconds).into();
+    Some(Duration::seconds(total))
 }
 
-pub fn parse_end_time(s: &str) -> Option<SystemTime> {
+pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
     let format = format_description::parse("[hour]:[minute]").ok()?;
-    let now = OffsetDateTime::now_utc();
+    let now = OffsetDateTime::now_local().ok()?;
     let end_time = Time::parse(s, &format).ok()?;
-    let end = now.replace_time(end_time);
-    let duration = end - now;
-    let system = SystemTime::now();
-    Some(system + duration)
+    Some(now.replace_time(end_time))
 }
 
-pub fn resize_term<W>(w: &mut W, end: SystemTime) -> Result<()>
+pub fn resize_term<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
 where
     W: io::Write,
 {
-    match end.duration_since(SystemTime::now()) {
-        Ok(counter) => ui::draw(w, counter),
-        Err(_) => ui::draw(w, Duration::ZERO),
+    match end - OffsetDateTime::now_utc() {
+        counter if counter > Duration::ZERO => ui::draw(w, counter),
+        counter if counter <= Duration::ZERO => ui::draw(w, Duration::ZERO),
+        _ => unreachable!(),
     }
 }
 
-pub fn countdown<W>(w: &mut W, end: SystemTime) -> Result<()>
+pub fn countdown<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
 where
     W: io::Write,
 {
-    match end.duration_since(SystemTime::now()) {
-        Ok(counter) => {
+    match end - OffsetDateTime::now_utc() {
+        counter if counter > Duration::ZERO => {
             ui::draw(w, counter)?;
-            sleep(Duration::from_secs(1));
+            sleep(stdDuration::from_secs(1));
             countdown(w, end)
         }
-        Err(_) => {
+        counter if counter <= Duration::ZERO => {
             ui::draw(w, Duration::ZERO)?;
             for _ in 0..BEEP_REPETITIONS {
-                beep(BEEP_FREQ, Duration::from_millis(BEEP_DURATION)).unwrap();
-                sleep(Duration::from_millis(BEEP_DELAY));
+                beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).unwrap();
+                sleep(stdDuration::from_millis(BEEP_DELAY));
             }
             Ok(())
         }
+        _ => unreachable!(),
     }
 }
 
@@ -95,16 +94,25 @@ mod tests {
 
     #[test]
     fn test_parse_counter_time() {
-        assert_eq!(Duration::from_secs(7800), parse_counter_time("2h10m").unwrap());
-        assert_eq!(Duration::from_secs(70), parse_counter_time("1m10s").unwrap());
-        assert_eq!(Duration::from_secs(420), parse_counter_time("5m120s").unwrap());
-        assert_eq!(Duration::from_secs(603), parse_counter_time("10m3s").unwrap());
-        assert_eq!(Duration::from_secs(35996400), parse_counter_time("9999h").unwrap());
+        assert_eq!(
+            Duration::seconds(7800),
+            parse_counter_time("2h10m").unwrap()
+        );
+        assert_eq!(Duration::seconds(70), parse_counter_time("1m10s").unwrap());
+        assert_eq!(
+            Duration::seconds(420),
+            parse_counter_time("5m120s").unwrap()
+        );
+        assert_eq!(Duration::seconds(603), parse_counter_time("10m3s").unwrap());
+        assert_eq!(
+            Duration::seconds(35996400),
+            parse_counter_time("9999h").unwrap()
+        );
     }
 
     #[test]
     fn test_parse_end_time() {
-        let now = OffsetDateTime::now_utc();
+        let now = OffsetDateTime::now_local().ok().unwrap();
         let date = OffsetDateTime::from(parse_end_time("12:00").unwrap());
         let expected_date = now.replace_time(time!(12:00));
         assert_eq!(date.to_ordinal_date(), expected_date.to_ordinal_date());

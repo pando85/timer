@@ -17,7 +17,7 @@ clap = "3.0.0-beta.5"
 crossterm = "0.22.1"
 regex = "1.5"
 signal-hook = "0.3"
-time = {version = "0.3.5", features = ["formatting", "parsing"]}
+time = {version = "0.3.5", features = ["formatting", "local-offset", "parsing"]}
 
 # beep
 libc = "0.2"

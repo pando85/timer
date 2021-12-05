@@ -1,13 +1,14 @@
-use std::time::Duration;
 use timer_core::beep::beep;
 use timer_core::timer;
 use timer_core::ui;
 
-use signal_hook::{consts::signal::*, iterator::Signals};
 use std::io;
 use std::process::exit;
 use std::thread;
-use std::time::SystemTime;
+use std::time::Duration;
+
+use signal_hook::{consts::signal::*, iterator::Signals};
+use time::OffsetDateTime;
 
 use clap::{crate_authors, crate_description, crate_version, Parser};
 
@@ -30,12 +31,10 @@ fn main() -> Result<(), io::Error> {
     let input_time = opts.time.join(" ");
     let end = match timer::parse_counter_time(input_time.as_str()) {
         Some(counter) => {
-            let now = SystemTime::now();
+            let now = OffsetDateTime::now_utc();
             now + counter
         }
-        None => {
-            timer::parse_end_time(input_time.as_str()).unwrap()
-        }
+        None => timer::parse_end_time(input_time.as_str()).unwrap(),
     };
 
     let mut stdout = io::stdout();
