@@ -17,11 +17,15 @@ clap = "3.0.0-beta.5"
 crossterm = "0.22.1"
 regex = "1.5"
 signal-hook = "0.3"
+time = {version = "0.3.5", features = ["formatting", "parsing"]}
 
 # beep
 libc = "0.2"
 nix = "0.20"
 lazy_static = "1.0"
+
+[dev-dependencies]
+time = {version = "0.3.5", features = ["macros"]}
 
 [dev-dependencies.cargo-husky]
 version = "1"

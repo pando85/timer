@@ -28,14 +28,18 @@ fn main() -> Result<(), io::Error> {
     let opts: Opts = Opts::parse();
 
     let input_time = opts.time.join(" ");
-    let counter = timer::parse_time(input_time.as_str()).unwrap();
+    let end = match timer::parse_counter_time(input_time.as_str()) {
+        Some(counter) => {
+            let now = SystemTime::now();
+            now + counter
+        }
+        None => {
+            timer::parse_end_time(input_time.as_str()).unwrap()
+        }
+    };
+
     let mut stdout = io::stdout();
     ui::set_up_terminal(&mut stdout).unwrap();
-
-    let mut signals = Signals::new(&[SIGWINCH, SIGTERM, SIGINT, SIGQUIT]).unwrap();
-
-    let now = SystemTime::now();
-    let end = now + counter;
 
     thread::spawn(move || {
         match timer::countdown(&mut stdout, end) {
@@ -47,6 +51,7 @@ fn main() -> Result<(), io::Error> {
         ui::restore_terminal(&mut stdout).unwrap();
     });
 
+    let mut signals = Signals::new(&[SIGWINCH, SIGTERM, SIGINT, SIGQUIT]).unwrap();
     let mut stdout = io::stdout();
 
     for signal in signals.forever() {
