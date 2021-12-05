@@ -1,11 +1,11 @@
 use std::io;
-use std::time::Duration;
 
 use crossterm::cursor;
 use crossterm::execute;
 use crossterm::style;
 use crossterm::terminal;
 use crossterm::Result;
+use time::Duration;
 
 use crate::figlet::Figlet;
 
@@ -53,7 +53,7 @@ where
 }
 
 fn time_to_string(counter: Duration) -> String {
-    let total_s = (counter.as_millis() as f64 / 1000.).round() as u64;
+    let total_s = (counter.whole_milliseconds() as f64 / 1000.).round() as u64;
     let hours = total_s / 3600;
     let minutes = if hours == 0 {
         total_s / 60
@@ -122,35 +122,32 @@ mod tests {
     #[test]
     fn test_time_to_string() {
         assert_eq!(
-            time_to_string(Duration::from_secs(7800)),
+            time_to_string(Duration::seconds(7800)),
             "2h 10m 0s".to_string()
         );
         assert_eq!(
-            time_to_string(Duration::from_secs(15323)),
+            time_to_string(Duration::seconds(15323)),
             "4h 15m 23s".to_string()
         );
+        assert_eq!(time_to_string(Duration::seconds(150)), "2m 30s".to_string());
+        assert_eq!(time_to_string(Duration::seconds(3)), "3s".to_string());
         assert_eq!(
-            time_to_string(Duration::from_secs(150)),
-            "2m 30s".to_string()
-        );
-        assert_eq!(time_to_string(Duration::from_secs(3)), "3s".to_string());
-        assert_eq!(
-            time_to_string(Duration::from_millis(2955)),
+            time_to_string(Duration::milliseconds(2955)),
             "3s".to_string()
         );
         assert_eq!(
-            time_to_string(Duration::from_millis(4355)),
+            time_to_string(Duration::milliseconds(4355)),
             "4s".to_string()
         );
         assert_eq!(
-            time_to_string(Duration::from_millis(59999)),
+            time_to_string(Duration::milliseconds(59999)),
             "1m 0s".to_string()
         );
         assert_eq!(
-            time_to_string(Duration::from_millis(7199999)),
+            time_to_string(Duration::milliseconds(7199999)),
             "2h 0m 0s".to_string()
         );
-        assert_eq!(time_to_string(Duration::from_secs(0)), "0s".to_string());
+        assert_eq!(time_to_string(Duration::seconds(0)), "0s".to_string());
     }
 
     #[test]
