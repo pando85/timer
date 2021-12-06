@@ -1,15 +1,18 @@
 use crate::beep::beep;
-use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS};
+use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, SOUND_START_DELAY};
+use crate::sound::Sound;
 use crate::ui;
 
+use std::error;
 use std::io;
 use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
-use crossterm::Result;
+use crossterm::Result as CrosstermResult;
+use regex::{Regex, RegexSet};
 use time::{format_description, Duration, OffsetDateTime, Time};
 
-use regex::{Regex, RegexSet};
+type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 pub fn parse_counter_time(s: &str) -> Option<Duration> {
     let re = Regex::new(r"(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m ?)?(?:(?P<seconds>\d+)s ?)?$")
@@ -59,7 +62,7 @@ pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
     Some(end_date.replace_time(end_time))
 }
 
-pub fn resize_term<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
+pub fn resize_term<W>(w: &mut W, end: OffsetDateTime) -> CrosstermResult<()>
 where
     W: io::Write,
 {
@@ -82,9 +85,18 @@ where
         }
         counter if counter <= Duration::ZERO => {
             ui::draw(w, Duration::ZERO)?;
+            let sound = Sound::new();
             for _ in 0..BEEP_REPETITIONS {
-                beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).unwrap();
-                sleep(stdDuration::from_millis(BEEP_DELAY));
+                sound.play()?;
+                // order in the delay is because sounds start beeping ~100ms later than beep
+                sleep(stdDuration::from_millis(SOUND_START_DELAY));
+                beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION))?;
+
+                // let this indicated for possible changes in constant values
+                #[allow(clippy::absurd_extreme_comparisons)]
+                if BEEP_DELAY - SOUND_START_DELAY > 0 {
+                    sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
+                }
             }
             Ok(())
         }
