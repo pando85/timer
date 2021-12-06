@@ -57,10 +57,7 @@ fn main() {
             }
             Err(e) => {
                 ui::restore_terminal(&mut stdout).unwrap();
-                match e.kind() {
-                    io::ErrorKind::WouldBlock => eprintln!("You must have a tty to run timer"),
-                    _ => eprintln!("Error: {:?}", e),
-                }
+                eprintln!("Error: {:?}", e);
             }
         };
         exit(0)
