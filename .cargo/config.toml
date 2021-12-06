@@ -1,4 +1,4 @@
 # time lib needs this for passing unit tests
 # https://github.com/time-rs/time/issues/325#issuecomment-836365620
-[build]
+[target.'cfg(target_os = "linux")']
 rustflags = ["--cfg", "unsound_local_offset"]
