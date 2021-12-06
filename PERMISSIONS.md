@@ -45,12 +45,12 @@ Where to install udev rules
 
 There are two locations where `udev(7)` rules can be installed:
 
-  * `/usr/lib/udev/rules.d/*.rules` or `/lib/udev/rules.d/*.rules`  
+  * `/usr/lib/udev/rules.d/*.rules` or `/lib/udev/rules.d/*.rules`
     This is the distribution dependent directory where distribution
     binary packages will install their static rules which are not to
     be modified by the system administrator.
 
-  * `/etc/udev/rules.d/*.rules`  
+  * `/etc/udev/rules.d/*.rules`
     This where the system administrator will install their special
     rules independent of any distribution packages.
 
@@ -180,13 +180,13 @@ to a single user. Give access to a special group of users.
 Here are a few __bad ideas__ you should __avoid__ when you change the
 permissions setup:
 
-  * DO NOT add users to the `input` group  
+  * DO NOT add users to the `input` group
     This would allow the users from the `input` group access to
     __all__ input devices.  This includes keyboards and mice which are
     none of their business (think keyloggers or reprogramming
     programmable keyboards).
 
-  * DO NOT run `beep` setuid root or via sudo-root  
+  * DO NOT run `beep` setuid root or via sudo-root
     There have been a few serious security issues for `beep` in 2018
     (CVE-2018-0492 and CVE-2018-1000532). Both had their impact when
     `beep` was run setuid root or via sudo-root.
