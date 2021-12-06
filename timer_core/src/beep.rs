@@ -8,6 +8,7 @@ use std::os::unix::io::AsRawFd;
 use std::thread::sleep;
 use std::time::Duration;
 
+use glob::glob;
 use lazy_static::lazy_static;
 use libc::{c_void, input_event, write};
 use nix::ioctl_write_int_bad;
@@ -22,9 +23,24 @@ const KIOCSOUND: u64 = 0x4B2F;
 const TIMER_FREQUENCY: u32 = 1193182;
 
 lazy_static! {
-    static ref DEVICE: Option<File> = DEVICE_PATHS
+    static ref DEVICE: Option<File> = get_device();
+}
+
+fn get_device() -> Option<File> {
+    let strings_from_glob = |x| {
+        glob(x)
+            .unwrap()
+            .map(|x| x.unwrap().to_str().unwrap().to_string())
+            .collect::<Vec<String>>()
+    };
+    let all_ttys = strings_from_glob("/dev/tty[0-9]*");
+    let all_vcs = strings_from_glob("/dev/vc/[0-9]*");
+    DEVICE_PATHS
         .into_iter()
-        .find_map(|d| OpenOptions::new().append(true).open(d).ok());
+        .map(|s| s.to_string())
+        .chain(all_ttys)
+        .chain(all_vcs)
+        .find_map(|d| OpenOptions::new().append(true).open(d).ok())
 }
 
 ioctl_write_int_bad!(kiocsound, KIOCSOUND);
