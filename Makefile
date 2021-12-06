@@ -1,4 +1,5 @@
 CARGO_TARGET_DIR ?= target
+PKG_BASE_NAME ?= timer-x86_64-unkown-linux-gnu
 
 .DEFAULT: help
 .PHONY: help
@@ -32,7 +33,7 @@ release:	## generate vendor.tar.gz and timer-v${VERSION}-x86_64-unkown-linux-gnu
 	cargo vendor
 	tar -czf vendor.tar.gz vendor
 	cargo build --release
-	tar -czf timer-x86_64-unkown-linux-gnu.tar.gz -C $(CARGO_TARGET_DIR)/release timer
+	tar -czf $(PKG_BASE_NAME).tar.gz -C $(CARGO_TARGET_DIR)/release timer
 
 publish:	## publish crates
 	@for package in $(shell find . -mindepth 2 -not -path './vendor/*' -name Cargo.toml -exec dirname {} \; | sort -r);do \
