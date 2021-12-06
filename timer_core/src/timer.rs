@@ -82,7 +82,7 @@ where
         }
         counter if counter <= Duration::ZERO => {
             ui::draw(w, Duration::ZERO)?;
-            let sound = Sound::new();
+            let sound = Sound::new()?;
             for _ in 0..BEEP_REPETITIONS {
                 sound.play()?;
                 // order in the delay is because sounds start beeping ~100ms later than beep

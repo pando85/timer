@@ -1,6 +1,8 @@
+use crate::Result;
+
 use std::io::{BufReader, Cursor};
 
-use rodio::{source::Source, Decoder, OutputStream, OutputStreamHandle, PlayError};
+use rodio::{source::Source, Decoder, OutputStream, OutputStreamHandle};
 
 pub struct Sound {
     _stream: OutputStream,
@@ -9,27 +11,22 @@ pub struct Sound {
 }
 
 impl Sound {
-    pub fn new() -> Self {
-        let (stream, stream_handle) = OutputStream::try_default().unwrap();
+    pub fn new() -> Result<Self> {
+        let (stream, stream_handle) = OutputStream::try_default()?;
         let contents = include_bytes!("beep.ogg");
-        Sound {
+        Ok(Sound {
             _stream: stream,
             stream_handle,
             cursor: Cursor::new(contents),
-        }
+        })
     }
 
     /// Play sound (it has a delay of ~100ms)
-    pub fn play(&self) -> Result<(), PlayError> {
+    pub fn play(&self) -> Result<()> {
         let buffer = BufReader::new(self.cursor.clone());
         let decoded = Decoder::new_vorbis(buffer).unwrap();
         let source = decoded.convert_samples();
-        self.stream_handle.play_raw(source)
-    }
-}
-
-impl Default for Sound {
-    fn default() -> Self {
-        Self::new()
+        self.stream_handle.play_raw(source)?;
+        Ok(())
     }
 }
