@@ -1,13 +1,26 @@
 # timer
 
 ![Build status](https://img.shields.io/github/workflow/status/pando85/timer/Rust/main)
-[![concept-map](https://img.shields.io/badge/design-concept--map-blue)](https://mind42.com/mindmap/6a6c7b23-f580-4c9e-a2b8-18cf68e4fe76)
 ![Timer license](https://img.shields.io/github/license/pando85/timer)
 
 Simple count down terminal alarm.
 
-## PC speaker
+## Features
 
-Sounds from the computer can be heard from the built-in case speaker, the speakers, or headphones which are plugged into the soundcard (in which case the noise may be unexpectedly loud).
+- Multiple input options.
+- Play sound when finish. (Beep included!)
+- Big centered output.
 
-If you want to use them as normal user read [`PERMISSIONS.md`](PERMISSIONS.md) file.
+## Installation
+
+Binaries are made available each release for the Linux and MacOS operating systems.
+
+You can download a prebuilt binary from our [Releases](https://github.com/pando85/timer/releases).
+
+## Beep
+
+If you want to enable beep from your built-in case speaker you will need to run one of these
+kernel modules: `pcspkr` (recommended) or `snd-pcsp`.
+
+In addition, to use beep as normal user read the [`PERMISSIONS.md`](PERMISSIONS.md) file.
+

@@ -20,7 +20,8 @@ use time::OffsetDateTime;
     setting = AppSettings::ArgRequiredElseHelp,
 )]
 struct Opts {
-    /// Remaining time until the alarm sounds
+    /// Remaining time until the alarm sounds. Format: `%Hh %Mm %Ss`.
+    /// In addition, it supports a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m.
     #[clap(multiple_occurrences = true, takes_value = true, number_of_values = 1)]
     time: Vec<String>,
 }
