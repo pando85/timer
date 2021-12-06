@@ -10,6 +10,7 @@ use std::time::Duration;
 
 use glob::glob;
 use lazy_static::lazy_static;
+#[cfg(target_os = "linux")]
 use libc::{c_void, input_event, write};
 use nix::ioctl_write_int_bad;
 
@@ -56,25 +57,6 @@ impl fmt::Display for DeviceError {
 
 impl Error for DeviceError {}
 
-pub fn beep(freq: i32, time: Duration) -> Result<()> {
-    let device = DEVICE.as_ref().ok_or(DeviceError)?;
-    let driver = match unsafe { kiocsound(device.as_raw_fd(), 0) } {
-        Ok(_) => Driver {
-            device,
-            beep: driver_console,
-        },
-        Err(_) => Driver {
-            device,
-            beep: driver_evdev,
-        },
-    };
-
-    driver.beep(freq)?;
-    sleep(time);
-    driver.beep(0)?;
-    Ok(())
-}
-
 struct Driver {
     device: &'static File,
     beep: fn(dev: &File, freq: i32) -> nix::Result<()>,
@@ -86,6 +68,7 @@ impl Driver {
     }
 }
 
+#[cfg(target_os = "linux")]
 fn driver_evdev(dev: &File, freq: i32) -> nix::Result<()> {
     unsafe {
         let mut e = MaybeUninit::<input_event>::zeroed().assume_init();
@@ -105,5 +88,37 @@ fn driver_console(dev: &File, freq: i32) -> nix::Result<()> {
     unsafe {
         kiocsound(dev.as_raw_fd(), period_in_clock_cycles as i32)?;
     }
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn get_driver(device: &'static File) -> Driver {
+    match unsafe { kiocsound(device.as_raw_fd(), 0) } {
+        Ok(_) => Driver {
+            device,
+            beep: driver_console,
+        },
+        Err(_) => Driver {
+            device,
+            beep: driver_evdev,
+        },
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn get_driver(device: &'static File) -> Driver {
+    Driver {
+        device,
+        beep: driver_console,
+    }
+}
+
+pub fn beep(freq: i32, time: Duration) -> Result<()> {
+    let device = DEVICE.as_ref().ok_or(DeviceError)?;
+    let driver = get_driver(device);
+
+    driver.beep(freq)?;
+    sleep(time);
+    driver.beep(0)?;
     Ok(())
 }

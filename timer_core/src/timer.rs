@@ -128,6 +128,9 @@ mod tests {
         );
     }
 
+    // macos is not able to build with `unsound_local_offset` feature:
+    // https://github.com/time-rs/time/issues/408
+    #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time() {
         let now = OffsetDateTime::now_local().ok().unwrap();
