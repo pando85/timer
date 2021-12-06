@@ -13,13 +13,15 @@ pub fn draw<W>(w: &mut W, counter: Duration) -> Result<()>
 where
     W: io::Write,
 {
+    let counter_string = time_to_string(counter);
+
     execute!(
         w,
+        terminal::SetTitle(&counter_string),
         terminal::Clear(terminal::ClearType::All),
         cursor::Hide,
         cursor::MoveTo(0, 0)
     )?;
-    let counter_string = time_to_string(counter);
 
     let figlet = Figlet::default();
     let figlet_string = figlet.convert(&counter_string);
