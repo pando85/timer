@@ -1,3 +1,7 @@
+use crate::Result;
+
+use std::error::Error;
+use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::mem::{size_of, MaybeUninit};
 use std::os::unix::io::AsRawFd;
@@ -6,7 +10,7 @@ use std::time::Duration;
 
 use lazy_static::lazy_static;
 use libc::{c_void, input_event, write};
-use nix::{ioctl_write_int_bad, Result};
+use nix::ioctl_write_int_bad;
 
 const DEVICE_PATHS: [&str; 2] = [
     "/dev/input/by-path/platform-pcspkr-event-spkr",
@@ -18,38 +22,55 @@ const KIOCSOUND: u64 = 0x4B2F;
 const TIMER_FREQUENCY: u32 = 1193182;
 
 lazy_static! {
-    static ref DEVICE: File = DEVICE_PATHS
+    static ref DEVICE: Option<File> = DEVICE_PATHS
         .into_iter()
-        .find_map(|d| OpenOptions::new().append(true).open(d).ok())
-        .unwrap_or_else(|| panic!("No device found in: {:?}", DEVICE_PATHS));
+        .find_map(|d| OpenOptions::new().append(true).open(d).ok());
 }
 
 ioctl_write_int_bad!(kiocsound, KIOCSOUND);
 
+#[derive(Debug, Clone)]
+struct DeviceError;
+
+impl fmt::Display for DeviceError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "No device found in: {:?}", DEVICE_PATHS)
+    }
+}
+
+impl Error for DeviceError {}
+
 pub fn beep(freq: i32, time: Duration) -> Result<()> {
-    let driver = match unsafe { kiocsound(DEVICE.as_raw_fd(), 0) } {
+    let device = DEVICE.as_ref().ok_or(DeviceError)?;
+    let driver = match unsafe { kiocsound(device.as_raw_fd(), 0) } {
         Ok(_) => Driver {
+            device,
             beep: driver_console,
         },
-        Err(_) => Driver { beep: driver_evdev },
+        Err(_) => Driver {
+            device,
+            beep: driver_evdev,
+        },
     };
 
     driver.beep(freq)?;
     sleep(time);
-    driver.beep(0)
+    driver.beep(0)?;
+    Ok(())
 }
 
 struct Driver {
-    beep: fn(freq: i32) -> Result<()>,
+    device: &'static File,
+    beep: fn(dev: &File, freq: i32) -> nix::Result<()>,
 }
 
 impl Driver {
-    pub fn beep(&self, freq: i32) -> Result<()> {
-        (self.beep)(freq)
+    pub fn beep(&self, freq: i32) -> nix::Result<()> {
+        (self.beep)(self.device, freq)
     }
 }
 
-fn driver_evdev(freq: i32) -> Result<()> {
+fn driver_evdev(dev: &File, freq: i32) -> nix::Result<()> {
     unsafe {
         let mut e = MaybeUninit::<input_event>::zeroed().assume_init();
         e.type_ = EV_SND;
@@ -57,16 +78,16 @@ fn driver_evdev(freq: i32) -> Result<()> {
         e.value = freq;
 
         let e_ptr: *mut c_void = &mut e as *mut _ as *mut c_void;
-        write(DEVICE.as_raw_fd(), e_ptr, size_of::<input_event>());
+        write(dev.as_raw_fd(), e_ptr, size_of::<input_event>());
     }
     Ok(())
 }
 
-fn driver_console(freq: i32) -> nix::Result<()> {
+fn driver_console(dev: &File, freq: i32) -> nix::Result<()> {
     let period_in_clock_cycles = TIMER_FREQUENCY.checked_div(freq as u32).unwrap_or(0);
 
     unsafe {
-        kiocsound(DEVICE.as_raw_fd(), period_in_clock_cycles as i32)?;
+        kiocsound(dev.as_raw_fd(), period_in_clock_cycles as i32)?;
     }
     Ok(())
 }
