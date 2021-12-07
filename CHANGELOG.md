@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2](https://github.com/pando85/timer/tree/v0.1.2) - 2021-12-07
+
+## Fixed
+
+- Fix github-actions for publishing packages
+- Add missing metadata to publish crates
+
 ## [0.1.1](https://github.com/pando85/timer/tree/v0.1.1) - 2021-12-07
 
 ## Fixed
