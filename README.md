@@ -1,4 +1,17 @@
-# timer
+<h1 align="center">
+  <br>
+  <img src="https://raw.githubusercontent.com/pando85/timer/main/assets/logo.svg" alt="logo" width="200">
+  <br>
+  Timer
+  <br>
+  <br>
+</h1>
+
+<p align="center">
+<video autoplay="" loop="" muted="" max-width="600px" style="display:block; margin: 0 auto;">
+	<source type="video/webm" src="https://raw.githubusercontent.com/pando85/timer/main/assets/demo.mp4">
+</video>
+</p>
 
 ![Build status](https://img.shields.io/github/workflow/status/pando85/timer/Rust/main)
 ![Timer license](https://img.shields.io/github/license/pando85/timer)
