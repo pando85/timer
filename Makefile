@@ -9,32 +9,35 @@ help:	## Show this help menu.
 	@@egrep -h "#[#]" $(MAKEFILE_LIST) | sed -e 's/\\$$//' | awk 'BEGIN {FS = "[:=].*?#[#] "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
-.PHONY: update-version
-update-version: ## update version from VERSION file in all Cargo.toml manifests
-update-version: */Cargo.toml
-	@VERSION=`cat VERSION`; sed -i "0,/^version\ \= .*$$/{s//version = \"$$VERSION\"/}" */Cargo.toml
-	@echo updated to version "`cat VERSION`" cargo files
-
 .PHONY: build
 build:	## compile timer
 build:
 	cargo build --release
 
+.PHONY: lint
 lint:	## lint code
 lint:
 	cargo clippy -- -D warnings
 	cargo fmt -- --check
 
+.PHONY: test
 test:	## run tests
 test: lint
 	cargo test
 
+.PHONY: tag
+tag:	## create a tag using version from Cargo.toml
+	PROJECT_VERSION=$$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1); \
+	git tag -s v$${PROJECT_VERSION}
+
+.PHONY: release
 release:	## generate vendor.tar.gz and timer-v${VERSION}-x86_64-unkown-linux-gnu.tar.gz
 	cargo vendor
 	tar -czf vendor.tar.gz vendor
 	cargo build --release
 	tar -czf $(PKG_BASE_NAME).tar.gz -C $(CARGO_TARGET_DIR)/release timer
 
+.PHONY: publish
 publish:	## publish crates
 	@for package in $(shell find . -mindepth 2 -not -path './vendor/*' -name Cargo.toml -exec dirname {} \; | sort -r);do \
 		cd $$package; \
