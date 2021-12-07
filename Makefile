@@ -32,8 +32,9 @@ test: lint
 release:	## generate vendor.tar.gz and timer-v${VERSION}-x86_64-unkown-linux-gnu.tar.gz
 	cargo vendor
 	tar -czf vendor.tar.gz vendor
-	cargo build --release
+	cargo build --frozen --release --all-features
 	tar -czf $(PKG_BASE_NAME).tar.gz -C $(CARGO_TARGET_DIR)/release timer
+	@echo Released in $(CARGO_TARGET_DIR)/release/timer
 
 publish:	## publish crates
 	@for package in $(shell find . -mindepth 2 -not -path './vendor/*' -name Cargo.toml -exec dirname {} \; | sort -r);do \
