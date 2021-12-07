@@ -8,9 +8,7 @@
 </h1>
 
 <p align="center">
-<video autoplay="" loop="" muted="" max-width="600px" style="display:block; margin: 0 auto;">
-	<source type="video/webm" src="https://raw.githubusercontent.com/pando85/timer/main/assets/demo.mp4">
-</video>
+  <img src="https://raw.githubusercontent.com/pando85/timer/main/assets/demo.gif" alt="demo">
 </p>
 
 ![Build status](https://img.shields.io/github/workflow/status/pando85/timer/Rust/main)
