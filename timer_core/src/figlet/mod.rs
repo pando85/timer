@@ -11,7 +11,7 @@ pub struct Figlet {
 }
 
 #[derive(Debug, Clone)]
-pub struct Char {
+struct Char {
     text: Vec<String>,
 }
 
@@ -64,7 +64,7 @@ impl Default for Figlet {
 
 /// Takes an iterator over lines of a .flf (figlet) file, and attempts to parse
 /// it into a Font, which can be used for rendering.
-pub fn parse<'a>(mut iter: impl Iterator<Item = &'a str>) -> Option<Figlet> {
+fn parse<'a>(mut iter: impl Iterator<Item = &'a str>) -> Option<Figlet> {
     let header: Vec<_> = iter.next()?.split(' ').collect();
 
     let height: usize = header.get(1)?.parse().ok()?;
