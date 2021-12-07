@@ -14,5 +14,5 @@
 # release
 vendor
 vendor.tar.gz
-timer-x86_64-unkown-linux-gnu.tar.gz
+timer-*.tar.gz
 PKGBUILD
