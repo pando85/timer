@@ -29,7 +29,8 @@ test: lint
 tag:	## create a tag using version from Cargo.toml
 	PROJECT_VERSION=$$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1); \
 	# add changelog to tag message \
-	git tag -s v$${PROJECT_VERSION}
+	git tag -s v$${PROJECT_VERSION} && \
+	git push origin v$${PROJECT_VERSION}
 
 .PHONY: release
 release:	## generate vendor.tar.gz and timer-v${VERSION}-x86_64-unkown-linux-gnu.tar.gz
