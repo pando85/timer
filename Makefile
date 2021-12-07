@@ -34,8 +34,9 @@ tag:	## create a tag using version from Cargo.toml
 release:	## generate vendor.tar.gz and timer-v${VERSION}-x86_64-unkown-linux-gnu.tar.gz
 	cargo vendor
 	tar -czf vendor.tar.gz vendor
-	cargo build --release
+	cargo build --frozen --release --all-features
 	tar -czf $(PKG_BASE_NAME).tar.gz -C $(CARGO_TARGET_DIR)/release timer
+	@echo Released in $(CARGO_TARGET_DIR)/release/timer
 
 .PHONY: publish
 publish:	## publish crates
