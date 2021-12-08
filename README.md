@@ -24,9 +24,34 @@ Simple count down terminal alarm.
 
 ## Installation
 
+### Cargo
+
+```
+cargo install timer_core
+```
+
+### Archlinux
+
+```
+yay -S timer-rs
+```
+
+### Binaries
+
 Binaries are made available each release for the Linux and MacOS operating systems.
 
 You can download a prebuilt binary from our [Releases](https://github.com/pando85/timer/releases).
+
+```
+curl -s https://api.github.com/repos/pando85/timer/releases/latest \
+  | grep browser_download_url \
+  | grep $(uname -m) \
+  | grep linux \
+  | cut -d '"' -f 4 \
+  | xargs curl -L \
+  | tar xvz
+sudo mv timer /usr/local/bin
+```
 
 ## Beep
 
