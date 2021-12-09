@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4](https://github.com/pando85/timer/tree/v0.1.4) - 2021-12-09
+
+### Fixed
+
+- Fix terminal flickering
+
 ## [0.1.3](https://github.com/pando85/timer/tree/v0.1.3) - 2021-12-07
 
 ### Added
