@@ -15,22 +15,21 @@ where
 {
     let counter_string = time_to_string(counter);
 
-    execute!(
-        w,
-        terminal::SetTitle(&counter_string),
-        terminal::Clear(terminal::ClearType::All),
-        cursor::Hide,
-        cursor::MoveTo(0, 0)
-    )?;
-
     let figlet = Figlet::default();
     let figlet_string = figlet.convert(&counter_string);
 
     let size = terminal::size()?;
-    let s = match center(size, figlet_string) {
+    let s = match center(size, &figlet_string) {
         Some(s) => s,
-        None => center(size, counter_string).unwrap(),
+        None => center(size, &counter_string).unwrap(),
     };
+
+    execute!(
+        w,
+        terminal::SetTitle(&counter_string),
+        cursor::MoveTo(0, 0),
+        terminal::Clear(terminal::ClearType::All),
+    )?;
     println!("{}", s);
     Ok(())
 }
@@ -39,7 +38,7 @@ pub fn set_up_terminal<W>(w: &mut W) -> Result<()>
 where
     W: io::Write,
 {
-    execute!(w, terminal::EnterAlternateScreen)
+    execute!(w, terminal::EnterAlternateScreen, cursor::Hide)
 }
 
 pub fn restore_terminal<W>(w: &mut W) -> Result<()>
@@ -78,8 +77,8 @@ fn time_to_string(counter: Duration) -> String {
     }
 }
 
-fn center(size: (u16, u16), s: String) -> Option<String> {
-    let s_size = get_size(&s);
+fn center(size: (u16, u16), s: &str) -> Option<String> {
+    let s_size = get_size(s);
     let distance = get_distance_from_top_left(size, s_size)?;
     let horizontal_space = vec![" "; distance.0 as usize].join("");
     let vertical_space = vec!["\n"; distance.1 as usize].join("");
