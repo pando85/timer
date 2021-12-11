@@ -12,8 +12,10 @@ use regex::{Regex, RegexSet};
 use time::{format_description, Duration, OffsetDateTime, Time};
 
 pub fn parse_counter_time(s: &str) -> Option<Duration> {
-    let re = Regex::new(r"(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m ?)?(?:(?P<seconds>\d+)s ?)?$")
-        .unwrap();
+    let re = Regex::new(
+        r"(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m(?:in)? ?)?(?:(?P<seconds>\d+)s ?)?$",
+    )
+    .unwrap();
 
     let caps = re.captures(s)?;
 
@@ -22,7 +24,7 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
         return None;
     };
 
-    let set = RegexSet::new(&[r"(\d+)h", r"(\d+)m", r"(\d+)s"]).unwrap();
+    let set = RegexSet::new(&[r"(\d+)h", r"(\d+)m(?:in)?", r"(\d+)s"]).unwrap();
 
     let matches: Vec<_> = set.matches(s).into_iter().collect();
 
@@ -126,6 +128,12 @@ mod tests {
             Duration::seconds(35996400),
             parse_counter_time("9999h").unwrap()
         );
+        assert_eq!(
+            Duration::seconds(1143),
+            parse_counter_time("19min3s").unwrap()
+        );
+        assert_eq!(Duration::seconds(60), parse_counter_time("1m").unwrap());
+        assert_eq!(None, parse_counter_time("boo"));
     }
 
     // macos is not able to build with `unsound_local_offset` feature:
