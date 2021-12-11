@@ -13,7 +13,7 @@ use time::{format_description, Duration, OffsetDateTime, Time};
 
 pub fn parse_counter_time(s: &str) -> Option<Duration> {
     let re = Regex::new(
-        r"(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m(?:in)? ?)?(?:(?P<seconds>\d+)s ?)?$",
+        r"(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m(?:in)? ?)?(?:(?P<seconds>\d+)s? ?)?$",
     )
     .unwrap();
 
@@ -24,7 +24,7 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
         return None;
     };
 
-    let set = RegexSet::new(&[r"(\d+)h", r"(\d+)m(?:in)?", r"(\d+)s"]).unwrap();
+    let set = RegexSet::new(&[r"(\d+)h", r"(\d+)m(?:in)?", r"(\d+)s?$"]).unwrap();
 
     let matches: Vec<_> = set.matches(s).into_iter().collect();
 
@@ -110,6 +110,7 @@ where
 mod tests {
     use super::*;
 
+    #[cfg(not(target_os = "macos"))]
     use time::macros::time;
 
     #[test]
@@ -133,6 +134,9 @@ mod tests {
             parse_counter_time("19min3s").unwrap()
         );
         assert_eq!(Duration::seconds(60), parse_counter_time("1m").unwrap());
+        assert_eq!(Duration::seconds(10), parse_counter_time("10").unwrap());
+        assert_eq!(Duration::seconds(120), parse_counter_time("120").unwrap());
+        assert_eq!(Duration::seconds(350), parse_counter_time("5m50").unwrap());
         assert_eq!(None, parse_counter_time("boo"));
     }
 

@@ -21,7 +21,8 @@ use time::OffsetDateTime;
 )]
 struct Opts {
     /// Remaining time until the alarm sounds. Format: `%Hh %Mm %Ss`.
-    /// In addition, it supports a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m.
+    /// It also supports `min` for minutes or empty for seconds.
+    /// In addition, it supports a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m, 15min, 10.
     #[clap(multiple_occurrences = true, takes_value = true, number_of_values = 1)]
     time: Vec<String>,
 }
