@@ -15,7 +15,7 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "timer"
-path = "src/main.rs"
+path = "src/bin/timer.rs"
 
 [dependencies]
 clap = { version = "3.0.0-rc.1", features = ["std", "color", "derive", "cargo"]}
