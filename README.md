@@ -18,21 +18,21 @@ Simple count down terminal alarm.
 
 ## Features
 
-- Multiple input options.
-- Play sound when finish. (Beep included!)
-- Big centered output.
+- Multiple input options
+- Play sound when finished (Beep included!)
+- Big centered output
 
 ## Installation
 
 ### Cargo
 
-```
+```bash
 cargo install timer_core
 ```
 
 ### Archlinux
 
-```
+```bash
 yay -S timer-rs
 ```
 
@@ -42,7 +42,7 @@ Binaries are made available each release for the Linux and MacOS operating syste
 
 You can download a prebuilt binary from our [Releases](https://github.com/pando85/timer/releases).
 
-```
+```bash
 curl -s https://api.github.com/repos/pando85/timer/releases/latest \
   | grep browser_download_url \
   | grep $(uname -m) \
@@ -59,4 +59,3 @@ If you want to enable beep from your built-in case speaker you will need to run 
 kernel modules: `pcspkr` (recommended) or `snd-pcsp`.
 
 In addition, to use beep as normal user read the [`PERMISSIONS.md`](PERMISSIONS.md) file.
-
