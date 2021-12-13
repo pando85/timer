@@ -13,7 +13,7 @@ use time::{format_description, Duration, OffsetDateTime, Time};
 
 pub fn parse_counter_time(s: &str) -> Option<Duration> {
     let re = Regex::new(
-        r"(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m(?:in)? ?)?(?:(?P<seconds>\d+)s? ?)?$",
+        r"^(?:(?P<hours>\d+)h ?)?(?:(?P<minutes>\d+)m(?:in)? ?)?(?:(?P<seconds>\d+)s? ?)?$",
     )
     .unwrap();
 
@@ -138,6 +138,7 @@ mod tests {
         assert_eq!(Duration::seconds(120), parse_counter_time("120").unwrap());
         assert_eq!(Duration::seconds(350), parse_counter_time("5m50").unwrap());
         assert_eq!(None, parse_counter_time("boo"));
+        assert_eq!(None, parse_counter_time("10:00"));
     }
 
     // macos is not able to build with `unsound_local_offset` feature:
