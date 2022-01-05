@@ -76,34 +76,34 @@ pub fn countdown<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
 where
     W: io::Write,
 {
-    match end - OffsetDateTime::now_utc() {
-        counter if counter > Duration::ZERO => {
+    loop {
+        let counter = end - OffsetDateTime::now_utc();
+        if counter > Duration::ZERO {
             ui::draw(w, counter)?;
             sleep(stdDuration::from_secs(1));
-            countdown(w, end)
+        } else {
+            break;
         }
-        counter if counter <= Duration::ZERO => {
-            ui::draw(w, Duration::ZERO)?;
-            let sound = Sound::new()?;
-            for _ in 0..BEEP_REPETITIONS {
-                sound.play()?;
-                // order in the delay is because sounds start beeping ~100ms later than beep
-                sleep(stdDuration::from_millis(SOUND_START_DELAY));
-                // ignore beep device is not writeable
-                if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
-                    sleep(stdDuration::from_millis(BEEP_DURATION));
-                }
-
-                // let this indicated for possible changes in constant values
-                #[allow(clippy::absurd_extreme_comparisons)]
-                if BEEP_DELAY - SOUND_START_DELAY > 0 {
-                    sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
-                }
-            }
-            Ok(())
-        }
-        _ => unreachable!(),
     }
+
+    ui::draw(w, Duration::ZERO)?;
+    let sound = Sound::new()?;
+    for _ in 0..BEEP_REPETITIONS {
+        sound.play()?;
+        // order in the delay is because sounds start beeping ~100ms later than beep
+        sleep(stdDuration::from_millis(SOUND_START_DELAY));
+        // ignore beep device is not writeable
+        if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
+            sleep(stdDuration::from_millis(BEEP_DURATION));
+        }
+
+        // let this indicated for possible changes in constant values
+        #[allow(clippy::absurd_extreme_comparisons)]
+        if BEEP_DELAY - SOUND_START_DELAY > 0 {
+            sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
