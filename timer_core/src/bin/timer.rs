@@ -7,7 +7,7 @@ use std::process::exit;
 use std::thread;
 use std::time::Duration;
 
-use clap::{crate_authors, crate_description, crate_version, AppSettings, IntoApp, Parser};
+use clap::{crate_authors, crate_description, crate_version, IntoApp, Parser};
 use signal_hook::{consts::signal::*, iterator::Signals};
 use time::OffsetDateTime;
 
@@ -17,7 +17,6 @@ use time::OffsetDateTime;
     about = crate_description!(),
     version = crate_version!(),
     author = crate_authors!("\n"),
-    setting = AppSettings::ArgRequiredElseHelp,
 )]
 struct Opts {
     /// Remaining time until the alarm sounds. Format: `%Hh %Mm %Ss`.
@@ -39,7 +38,7 @@ fn main() {
         None => match timer::parse_end_time(input_time.as_str()) {
             Some(x) => x,
             None => {
-                Opts::into_app().print_help().unwrap();
+                Opts::command().print_help().unwrap();
                 eprintln!(
                     "Error: Invalid value: Unable to parse TIME value '{}'",
                     input_time.as_str()
