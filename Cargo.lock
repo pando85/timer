@@ -1017,7 +1017,7 @@ checksum = "42657b1a6f4d817cda8e7a0ace261fe0cc946cf3a80314390b22cc61ae080792"
 
 [[package]]
 name = "timer_core"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cargo-husky",
  "clap",

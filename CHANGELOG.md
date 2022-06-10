@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.2](https://github.com/pando85/timer/tree/v0.3.2) - 2022-06-10
+
+### Fixed
+
+* Bumps [regex](https://github.com/rust-lang/regex) from 1.5.4 to 1.5.5.
+  * [Release notes](https://github.com/rust-lang/regex/releases)
+  * [Changelog](https://github.com/rust-lang/regex/blob/master/CHANGELOG.md)
+  * [Commits](https://github.com/rust-lang/regex/compare/1.5.4...1.5.5)
+* Update all dependencies
+
 ## [v0.3.1](https://github.com/pando85/timer/tree/v0.3.1) - 2022-01-05
 
 ### Fixed
