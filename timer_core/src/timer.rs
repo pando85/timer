@@ -1,7 +1,10 @@
 use crate::beep::beep;
-use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, SOUND_START_DELAY};
+use crate::constants::{
+    BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, PLAY_TIMEOUT, SOUND_START_DELAY,
+};
 use crate::sound::Sound;
 use crate::ui;
+use crate::utils::spawn_thread;
 use crate::Result;
 
 use std::io;
@@ -72,6 +75,35 @@ where
     }
 }
 
+fn play_beep() -> Result<()> {
+    for _ in 0..BEEP_REPETITIONS {
+        // order in the delay is because sounds start beeping ~100ms later than beep
+        sleep(stdDuration::from_millis(SOUND_START_DELAY));
+        // ignore beep device is not writeable
+        if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
+            sleep(stdDuration::from_millis(BEEP_DURATION));
+        }
+
+        // let this indicated for possible changes in constant values
+        #[allow(clippy::absurd_extreme_comparisons)]
+        if BEEP_DELAY - SOUND_START_DELAY > 0 {
+            sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
+        }
+    }
+    Ok(())
+}
+
+fn play_sound() -> Result<()> {
+    let sound = Sound::new()?;
+
+    for _ in 0..BEEP_REPETITIONS {
+        sound.play()?;
+        sleep(stdDuration::from_millis(BEEP_DURATION));
+        sleep(stdDuration::from_millis(BEEP_DELAY))
+    }
+    Ok(())
+}
+
 pub fn countdown<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
 where
     W: io::Write,
@@ -87,23 +119,11 @@ where
     }
 
     ui::draw(w, Duration::ZERO)?;
-    let sound = Sound::new()?;
-    for _ in 0..BEEP_REPETITIONS {
-        sound.play()?;
-        // order in the delay is because sounds start beeping ~100ms later than beep
-        sleep(stdDuration::from_millis(SOUND_START_DELAY));
-        // ignore beep device is not writeable
-        if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
-            sleep(stdDuration::from_millis(BEEP_DURATION));
-        }
-
-        // let this indicated for possible changes in constant values
-        #[allow(clippy::absurd_extreme_comparisons)]
-        if BEEP_DELAY - SOUND_START_DELAY > 0 {
-            sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
-        }
-    }
-    Ok(())
+    let handler_with_timeout =
+        // error cannot be printed because we restore the terminal after this
+        spawn_thread(|| play_sound().unwrap());
+    play_beep()?;
+    handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
 }
 
 #[cfg(test)]

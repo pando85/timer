@@ -5,5 +5,6 @@ pub mod sound;
 mod time;
 pub mod timer;
 pub mod ui;
+mod utils;
 
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
