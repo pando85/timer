@@ -147,7 +147,7 @@ mod tests {
     #[test]
     fn test_parse_end_time() {
         let now = OffsetDateTime::now_local().ok().unwrap();
-        let date = OffsetDateTime::from(parse_end_time("12:00").unwrap());
+        let date = parse_end_time("12:00").unwrap();
         let expected_date = now.replace_time(time!(12:00));
         assert_eq!(date.to_hms(), expected_date.to_hms());
     }

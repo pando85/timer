@@ -68,7 +68,7 @@ fn parse<'a>(mut iter: impl Iterator<Item = &'a str>) -> Option<Figlet> {
     let header: Vec<_> = iter.next()?.split(' ').collect();
 
     let height: usize = header.get(1)?.parse().ok()?;
-    let hard_blank = header.get(0)?.chars().last()?;
+    let hard_blank = header.first()?.chars().last()?;
     let comments: usize = header.get(5)?.parse().ok()?;
 
     let mut chars: Vec<Char> = Vec::new();
