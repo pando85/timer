@@ -7,7 +7,7 @@ lazy_static! {
     static ref FIGLET: Figlet = Figlet::default();
 }
 
-#[cfg_attr(test, derive(Debug, PartialEq))]
+#[cfg_attr(test, derive(Debug, PartialEq, Eq))]
 pub struct Time {
     hours: u64,
     minutes: u8,
