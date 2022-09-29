@@ -16,10 +16,19 @@
 
 Simple count down terminal alarm.
 
+- [Features](#features)
+- [Installation](#installation)
+  - [Cargo](#cargo)
+  - [Archlinux](#archlinux)
+  - [Binaries](#binaries)
+- [Beep](#beep)
+- [Terminal bell](#terminal-bell)
+
 ## Features
 
 - Multiple input options
 - Play sound when finished (Beep included!)
+- Send terminal bell
 - Big centered output
 
 ## Installation
@@ -59,3 +68,18 @@ If you want to enable beep from your built-in case speaker you will need to run 
 kernel modules: `pcspkr` (recommended) or `snd-pcsp`.
 
 In addition, to use beep as normal user read the [`PERMISSIONS.md`](PERMISSIONS.md) file.
+
+## Terminal bell
+
+If executed with `-t, --terminal-bell` option it will send a bell character. Same as:
+
+```bash
+echo -e '\a'
+```
+
+This is useful for visual bell. Remember that you have to enable it in your terminal configuration.
+Usage example:
+
+```bash
+timer -t -s 11:00
+```

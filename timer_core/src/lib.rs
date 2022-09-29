@@ -1,6 +1,7 @@
 pub mod beep;
 pub mod constants;
 pub mod figlet;
+pub mod opts;
 pub mod sound;
 mod time;
 pub mod timer;
