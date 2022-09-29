@@ -2,6 +2,7 @@ use crate::beep::beep;
 use crate::constants::{
     BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, PLAY_TIMEOUT, SOUND_START_DELAY,
 };
+use crate::opts::Opts;
 use crate::sound::Sound;
 use crate::ui;
 use crate::utils::spawn_thread;
@@ -13,6 +14,8 @@ use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
 use time::{format_description, Duration, OffsetDateTime, Time};
+
+pub const BELL_CHART: char = '';
 
 pub fn parse_counter_time(s: &str) -> Option<Duration> {
     let re = Regex::new(
@@ -104,7 +107,7 @@ fn play_sound() -> Result<()> {
     Ok(())
 }
 
-pub fn countdown<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
+pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
 where
     W: io::Write,
 {
@@ -119,11 +122,19 @@ where
     }
 
     ui::draw(w, Duration::ZERO)?;
-    let handler_with_timeout =
+    if opts.terminal_bell {
+        println!("{}", BELL_CHART);
+    }
+
+    let mut result = Ok(());
+    if !opts.silence {
+        let handler_with_timeout =
         // error cannot be printed because we restore the terminal after this
         spawn_thread(|| play_sound().unwrap());
-    play_beep()?;
-    handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
+        play_beep()?;
+        result = handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
+    }
+    result
 }
 
 #[cfg(test)]

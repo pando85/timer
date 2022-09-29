@@ -1,4 +1,5 @@
 use timer_core::beep::beep;
+use timer_core::opts::Opts;
 use timer_core::timer;
 use timer_core::ui;
 
@@ -7,24 +8,9 @@ use std::process::exit;
 use std::thread;
 use std::time::Duration;
 
-use clap::{crate_authors, crate_description, crate_version, IntoApp, Parser};
+use clap::{IntoApp, Parser};
 use signal_hook::{consts::signal::*, iterator::Signals};
 use time::OffsetDateTime;
-
-#[derive(Parser)]
-#[clap(
-    name="timer",
-    about = crate_description!(),
-    version = crate_version!(),
-    author = crate_authors!("\n"),
-)]
-struct Opts {
-    /// Remaining time until the alarm sounds. Format: `%Hh %Mm %Ss`.
-    /// It also supports `min` for minutes or empty for seconds.
-    /// In addition, it supports a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m, 15min, 10.
-    #[clap(multiple_occurrences = true, takes_value = true, number_of_values = 1)]
-    time: Vec<String>,
-}
 
 fn main() {
     let opts: Opts = Opts::parse();
@@ -52,7 +38,7 @@ fn main() {
     ui::set_up_terminal(&mut stdout).unwrap();
 
     let thread_join_handle = thread::spawn(move || {
-        match timer::countdown(&mut stdout, end) {
+        match timer::countdown(&mut stdout, end, &opts) {
             Ok(_) => {
                 ui::restore_terminal(&mut stdout).unwrap();
             }

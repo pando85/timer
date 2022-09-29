@@ -83,7 +83,7 @@ impl Time {
                 Some(s) => s,
                 None => match self.try_render(size, true, true, true) {
                     Some(s) => s,
-                    // safe unwrap: if is centered return string without figlet
+                    // safe unwrap: if is not centered return string without figlet
                     None => self.try_render(size, false, false, false).unwrap(),
                 },
             },
