@@ -12,41 +12,56 @@ use clap::{IntoApp, Parser};
 use signal_hook::{consts::signal::*, iterator::Signals};
 use time::OffsetDateTime;
 
+fn parse_time(input_time: &str) -> Option<OffsetDateTime> {
+    match timer::parse_counter_time(input_time) {
+        Some(counter) => {
+            let now = OffsetDateTime::now_utc();
+            Some(now + counter)
+        }
+        None => timer::parse_end_time(input_time),
+    }
+}
+
+fn handle_countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) {
+    match timer::countdown(w, end, opts) {
+        Ok(_) => {
+            ui::restore_terminal(w).unwrap();
+        }
+        Err(e) => {
+            ui::restore_terminal(w).unwrap();
+            eprintln!("Error: {:?}", e);
+        }
+    };
+}
+
 fn main() {
     let opts: Opts = Opts::parse();
 
     let input_time = opts.time.join(" ");
-    let end = match timer::parse_counter_time(input_time.as_str()) {
-        Some(counter) => {
-            let now = OffsetDateTime::now_utc();
-            now + counter
+    let end = match parse_time(input_time.as_str()) {
+        Some(x) => x,
+        None => {
+            Opts::command().print_help().unwrap();
+            eprintln!(
+                "Error: Invalid value: Unable to parse TIME value '{}'",
+                input_time.as_str()
+            );
+            exit(1);
         }
-        None => match timer::parse_end_time(input_time.as_str()) {
-            Some(x) => x,
-            None => {
-                Opts::command().print_help().unwrap();
-                eprintln!(
-                    "Error: Invalid value: Unable to parse TIME value '{}'",
-                    input_time.as_str()
-                );
-                exit(1);
-            }
-        },
     };
 
     let mut stdout = io::stdout();
     ui::set_up_terminal(&mut stdout).unwrap();
 
     let thread_join_handle = thread::spawn(move || {
-        match timer::countdown(&mut stdout, end, &opts) {
-            Ok(_) => {
-                ui::restore_terminal(&mut stdout).unwrap();
+        handle_countdown(&mut stdout, end, &opts);
+        if opts.r#loop {
+            loop {
+                // safe unwrap: previously checked
+                let new_end = parse_time(input_time.as_str()).unwrap();
+                handle_countdown(&mut stdout, new_end, &opts);
             }
-            Err(e) => {
-                ui::restore_terminal(&mut stdout).unwrap();
-                eprintln!("Error: {:?}", e);
-            }
-        };
+        }
         exit(0)
     });
 

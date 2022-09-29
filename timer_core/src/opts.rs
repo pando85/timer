@@ -8,6 +8,9 @@ use clap::{crate_authors, crate_description, crate_version, Parser};
     author = crate_authors!("\n"),
 )]
 pub struct Opts {
+    /// Repeat countdown infinitely
+    #[clap(short, long)]
+    pub r#loop: bool,
     /// Disable playing sounds
     #[clap(short, long)]
     pub silence: bool,
@@ -16,7 +19,7 @@ pub struct Opts {
     pub terminal_bell: bool,
     /// Remaining time until the alarm sounds. Format: `%Hh %Mm %Ss`.
     /// It also supports `min` for minutes or empty for seconds.
-    /// In addition, it supports a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m, 15min, 10.
+    /// In addition, you can set a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m, 15min, 10.
     #[clap(multiple_occurrences = true, takes_value = true, number_of_values = 1)]
     pub time: Vec<String>,
 }

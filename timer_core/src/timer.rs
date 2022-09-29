@@ -107,10 +107,7 @@ fn play_sound() -> Result<()> {
     Ok(())
 }
 
-pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
-where
-    W: io::Write,
-{
+pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()> {
     loop {
         let counter = end - OffsetDateTime::now_utc();
         if counter > Duration::ZERO {
