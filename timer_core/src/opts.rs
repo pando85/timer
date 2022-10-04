@@ -1,4 +1,4 @@
-use clap::{crate_authors, crate_description, crate_version, Parser};
+use clap::{crate_authors, crate_description, crate_version, ArgAction, Parser};
 
 #[derive(Parser)]
 #[clap(
@@ -20,6 +20,6 @@ pub struct Opts {
     /// Remaining time until the alarm sounds. Format: `%Hh %Mm %Ss`.
     /// It also supports `min` for minutes or empty for seconds.
     /// In addition, you can set a target time `%H:%M`. E.g.: 10s, 12:00, 3h10m, 15min, 10.
-    #[clap(multiple_occurrences = true, takes_value = true, number_of_values = 1)]
+    #[clap(action = ArgAction::Append, number_of_values = 1)]
     pub time: Vec<String>,
 }

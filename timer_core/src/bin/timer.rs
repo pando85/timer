@@ -8,7 +8,7 @@ use std::process::exit;
 use std::thread;
 use std::time::Duration;
 
-use clap::{IntoApp, Parser};
+use clap::{CommandFactory, Parser};
 use signal_hook::{consts::signal::*, iterator::Signals};
 use time::OffsetDateTime;
 
