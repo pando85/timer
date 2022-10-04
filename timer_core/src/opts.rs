@@ -23,3 +23,9 @@ pub struct Opts {
     #[arg(action = ArgAction::Append, num_args = 1)]
     pub time: Vec<String>,
 }
+
+#[test]
+fn verify_cli() {
+    use clap::CommandFactory;
+    Opts::command().debug_assert()
+}
