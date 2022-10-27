@@ -13,6 +13,7 @@ use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
+use tailcall::tailcall;
 use time::{format_description, Duration, OffsetDateTime, Time};
 
 pub const BELL_CHART: char = '';
@@ -107,31 +108,31 @@ fn play_sound() -> Result<()> {
     Ok(())
 }
 
+#[tailcall]
 pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()> {
-    loop {
-        let counter = end - OffsetDateTime::now_utc();
-        if counter > Duration::ZERO {
+    match end - OffsetDateTime::now_utc() {
+        counter if counter > Duration::ZERO => {
             ui::draw(w, counter)?;
             sleep(stdDuration::from_secs(1));
-        } else {
-            break;
+            countdown(w, end, opts)
         }
-    }
+        counter if counter <= Duration::ZERO => {
+            ui::draw(w, Duration::ZERO)?;
+            if opts.terminal_bell {
+                println!("{}", BELL_CHART);
+            }
 
-    ui::draw(w, Duration::ZERO)?;
-    if opts.terminal_bell {
-        println!("{}", BELL_CHART);
+            let mut result = Ok(());
+            if !opts.silence {
+                // error cannot be printed because we restore the terminal after this
+                let handler_with_timeout = spawn_thread(|| play_sound().unwrap());
+                play_beep()?;
+                result = handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
+            }
+            result
+        }
+        _ => unreachable!(),
     }
-
-    let mut result = Ok(());
-    if !opts.silence {
-        let handler_with_timeout =
-        // error cannot be printed because we restore the terminal after this
-        spawn_thread(|| play_sound().unwrap());
-        play_beep()?;
-        result = handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
-    }
-    result
 }
 
 #[cfg(test)]
