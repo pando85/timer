@@ -2,6 +2,6 @@
 
 - Bump version in `timer_core/Cargo.toml`.
 - Update lock file: `cargo update -p timer_core`.
-- Update `CHANGELOG.md`.
+- Update `CHANGELOG.md` with `make update-changelog`.
 - Merge PR.
 - Tag version in main branch: `make tag`
