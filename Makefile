@@ -26,6 +26,11 @@ test:	## run tests
 test: lint
 	cargo test
 
+.PHONY: update-changelog
+update-changelog:	## automatically update changelog based on commits
+	PROJECT_VERSION=$$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1); \
+	git cliff -t v$${PROJECT_VERSION} -u -p CHANGELOG.md
+
 .PHONY: tag
 tag:	## create a tag using version from Cargo.toml
 	PROJECT_VERSION=$$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1); \
