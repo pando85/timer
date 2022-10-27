@@ -1,6 +1,7 @@
 CARGO_TARGET_DIR ?= target
 CARGO_TARGET ?= x86_64-unknown-linux-gnu
 PKG_BASE_NAME ?= timer-${CARGO_TARGET}
+PROJECT_VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1)
 
 .DEFAULT: help
 .PHONY: help
@@ -28,14 +29,12 @@ test: lint
 
 .PHONY: update-changelog
 update-changelog:	## automatically update changelog based on commits
-	PROJECT_VERSION=$$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1); \
-	git cliff -t v$${PROJECT_VERSION} -u -p CHANGELOG.md
+	git cliff -t v$(PROJECT_VERSION) -u -p CHANGELOG.md
 
 .PHONY: tag
 tag:	## create a tag using version from Cargo.toml
-	PROJECT_VERSION=$$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1); \
-	git tag -s v$${PROJECT_VERSION}  -m "v$${PROJECT_VERSION}" && \
-	git push origin v$${PROJECT_VERSION}
+	git tag -s v$(PROJECT_VERSION)  -m "v$(PROJECT_VERSION)" && \
+	git push origin v$(PROJECT_VERSION)
 
 .PHONY: release
 release:	## generate vendor.tar.gz and $(PKG_BASE_NAME).tar.gz
