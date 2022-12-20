@@ -65,7 +65,7 @@ fn main() {
         exit(0)
     });
 
-    let mut signals = Signals::new(&[SIGWINCH, SIGTERM, SIGINT, SIGQUIT]).unwrap();
+    let mut signals = Signals::new([SIGWINCH, SIGTERM, SIGINT, SIGQUIT]).unwrap();
     let mut stdout_signals_thread = io::stdout();
 
     for signal in &mut signals {
