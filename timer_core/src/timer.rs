@@ -31,7 +31,7 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
         return None;
     };
 
-    let set = RegexSet::new(&[r"(\d+)h", r"(\d+)m(?:in)?", r"(\d+)s?$"]).unwrap();
+    let set = RegexSet::new([r"(\d+)h", r"(\d+)m(?:in)?", r"(\d+)s?$"]).unwrap();
 
     let matches: Vec<_> = set.matches(s).into_iter().collect();
 
