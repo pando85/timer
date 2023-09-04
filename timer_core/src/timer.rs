@@ -68,7 +68,7 @@ pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
     Some(end_date.replace_time(end_time))
 }
 
-pub fn resize_term<W>(w: &mut W, end: OffsetDateTime) -> crossterm::Result<()>
+pub fn resize_term<W>(w: &mut W, end: OffsetDateTime) -> Result<()>
 where
     W: io::Write,
 {
@@ -175,7 +175,13 @@ mod tests {
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time() {
+        // Workaround `OffsetDateTime::now_local()` failing in tests:
+        // https://github.com/time-rs/time/blob/main/CHANGELOG.md#0318-2023-02-16
+        unsafe {
+            time::util::local_offset::set_soundness(time::util::local_offset::Soundness::Unsound);
+        }
         let now = OffsetDateTime::now_local().ok().unwrap();
+
         let date = parse_end_time("12:00").unwrap();
         let expected_date = now.replace_time(time!(12:00));
         assert_eq!(date.to_hms(), expected_date.to_hms());
