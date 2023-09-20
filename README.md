@@ -11,7 +11,7 @@
   <img src="https://raw.githubusercontent.com/pando85/timer/main/assets/demo.gif" alt="demo">
 </p>
 
-![Build status](https://img.shields.io/github/workflow/status/pando85/timer/Rust/main)
+![Build status](https://img.shields.io/github/actions/workflow/status/pando85/timer/rust.yml?branch=main)
 ![Timer license](https://img.shields.io/github/license/pando85/timer)
 
 Simple count down terminal alarm.
