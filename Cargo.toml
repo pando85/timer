@@ -2,3 +2,4 @@
 members = [
     "timer_core",
 ]
+resolver = "2"
