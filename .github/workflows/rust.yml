@@ -2,11 +2,11 @@ name: Rust
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     tags:
       - v[0-9]*
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   fmt:
@@ -56,80 +56,81 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { target: x86_64-apple-darwin, os: macos-12}
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest, container: quay.io/pypa/manylinux2014_x86_64}
+          - { target: x86_64-apple-darwin, os: macos-12 }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest, container: quay.io/pypa/manylinux2014_x86_64 }
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
     # Use a container with GLIBC 2.17, make build compatible until that version
     container: ${{ matrix.job.container }}
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      shell: bash
-      run: |
-        case ${{ matrix.job.target }} in
-          x86_64-unknown-linux-gnu) yum install -y alsa-lib-devel;;
-        esac
+      - name: Install dependencies
+        shell: bash
+        run: |
+          case ${{ matrix.job.target }} in
+            x86_64-unknown-linux-gnu) yum install -y alsa-lib-devel;;
+          esac
 
-    - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
+        if: ${{ matrix.job.container == null }}
 
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: ${{ matrix.job.target }}
-        override: true
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
 
-    - name: Build
-      shell: bash
-      run: cargo build --verbose
+      - name: Build
+        shell: bash
+        run: cargo build --verbose
 
-    - name: Run tests
-      shell: bash
-      run: cargo test --verbose
+      - name: Run tests
+        shell: bash
+        run: cargo test --verbose
 
-    - name: Extract crate information
-      shell: bash
-      run: |
-        echo "PROJECT_NAME=timer" >> $GITHUB_ENV
-        echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1)" >> $GITHUB_ENV
+      - name: Extract crate information
+        shell: bash
+        run: |
+          echo "PROJECT_NAME=timer" >> $GITHUB_ENV
+          echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1)" >> $GITHUB_ENV
 
-    - name: Make release
-      id: package
-      shell: bash
-      run: |
-        export CARGO_TARGET=${{ matrix.job.target }}
-        export PKG_BASE_NAME=${PROJECT_NAME}-${PROJECT_VERSION}-${CARGO_TARGET}
-        make release
-        echo "::set-output name=PKG_BASE_NAME::${PKG_BASE_NAME}"
+      - name: Make release
+        id: package
+        shell: bash
+        run: |
+          export CARGO_TARGET=${{ matrix.job.target }}
+          export PKG_BASE_NAME=${PROJECT_NAME}-${PROJECT_VERSION}-${CARGO_TARGET}
+          make release
+          echo "::set-output name=PKG_BASE_NAME::${PKG_BASE_NAME}"
 
-    - name: Publish crates
-      if: startsWith(github.ref, 'refs/tags/')
-      env:
-        CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
-      shell: bash
-      run: |
-        cargo login "${CRATES_IO_TOKEN}"
-        make publish
+      - name: Publish crates
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        shell: bash
+        run: |
+          cargo login "${CRATES_IO_TOKEN}"
+          make publish
 
-    - name: Get Changelog Entry
-      if: startsWith(github.ref, 'refs/tags/')
-      id: changelog_reader
-      uses: mindsers/changelog-reader-action@v2
-      with:
-        version: v${{ env.PROJECT_VERSION }}
-        path: ./CHANGELOG.md
+      - name: Get Changelog Entry
+        if: startsWith(github.ref, 'refs/tags/')
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          version: v${{ env.PROJECT_VERSION }}
+          path: ./CHANGELOG.md
 
-    - name: Publish
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        body: ${{ steps.changelog_reader.outputs.changes }}
-        prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
-        draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
-        files: |
-          ${{ steps.package.outputs.PKG_BASE_NAME }}.tar.gz
-          vendor.tar.gz
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
+          draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
+          files: |
+            ${{ steps.package.outputs.PKG_BASE_NAME }}.tar.gz
+            vendor.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
