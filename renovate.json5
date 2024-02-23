@@ -4,7 +4,7 @@
   packageRules: [
     {
       matchPackagePatterns: ".*",
-      commitMessagePrefix: "ci: ",
+      commitMessagePrefix: "build(deps): ",
     },
   ],
 }
