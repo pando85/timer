@@ -58,7 +58,9 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
 pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
     let format = format_description::parse("[hour]:[minute]").ok()?;
     let now = OffsetDateTime::now_local().ok()?;
-    let end_time = Time::parse(s, &format).ok()?;
+    let end_time = Time::parse(s, &format)
+        .or_else(|_| Time::parse(&format!("0{s}"), &format))
+        .ok()?;
     let (h, m, s) = now.to_hms();
     let end_date = if Time::from_hms(h, m, s).ok()? >= end_time {
         now + Duration::days(1)
@@ -184,6 +186,23 @@ mod tests {
 
         let date = parse_end_time("12:00").unwrap();
         let expected_date = now.replace_time(time!(12:00));
+        assert_eq!(date.to_hms(), expected_date.to_hms());
+    }
+
+    // macos is not able to build with `unsound_local_offset` feature:
+    // https://github.com/time-rs/time/issues/408
+    #[cfg(not(target_os = "macos"))]
+    #[test]
+    fn test_parse_end_time_leading_zero() {
+        // Workaround `OffsetDateTime::now_local()` failing in tests:
+        // https://github.com/time-rs/time/blob/main/CHANGELOG.md#0318-2023-02-16
+        unsafe {
+            time::util::local_offset::set_soundness(time::util::local_offset::Soundness::Unsound);
+        }
+        let now = OffsetDateTime::now_local().ok().unwrap();
+
+        let date = parse_end_time("9:30").unwrap();
+        let expected_date = now.replace_time(time!(9:30));
         assert_eq!(date.to_hms(), expected_date.to_hms());
     }
 }
