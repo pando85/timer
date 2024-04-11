@@ -25,14 +25,14 @@ regex = "1.10"
 rodio = { version = "0.17", features = ["vorbis"]}
 signal-hook = "0.3"
 tailcall = "1.0.1"
-time = { version = "0.3.35", features = ["formatting", "local-offset", "parsing"]}
+time = { version = "0.3.36", features = ["formatting", "local-offset", "parsing"]}
 # beep
 libc = "0.2"
 nix = { version = "0.28", features = ["ioctl"]}
 lazy_static = "1.4"
 
 [dev-dependencies]
-time = { version = "0.3.35", features = ["macros"] }
+time = { version = "0.3.36", features = ["macros"] }
 
 [dev-dependencies.cargo-husky]
 version = "1.5"
