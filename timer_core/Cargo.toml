@@ -27,7 +27,7 @@ signal-hook = "0.3"
 tailcall = "1.0.1"
 time = { version = "0.3.35", features = ["formatting", "local-offset", "parsing"]}
 # beep
-libc = "0.2"
+libc = "0.2.154"
 nix = { version = "0.28", features = ["ioctl"]}
 lazy_static = "1.4"
 
