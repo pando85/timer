@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.1](https://github.com/pando85/timer/tree/v0.7.1) - 2024-05-08
+
+### Build
+
+* Update KSXGitHub/github-actions-deploy-aur action to v2.7.1
+* Update wagoid/commitlint-github-action action to v6.0.1
+* Update Rust crate time to 0.3.35
+* Update Rust crate clap to 4.5.4
+* Update Rust crate time to 0.3.36
+* Update Rust crate glob to 0.3.1
+* Update Rust crate regex to 1.10.4
+* Update Rust crate libc to 0.2.154
+* Update Rust crate rodio to 0.17.3
+* Update Rust crate signal-hook to 0.3.17
+
 ## [v0.7.0](https://github.com/pando85/timer/tree/v0.7.0) - 2024-03-30
 
 ### Added
