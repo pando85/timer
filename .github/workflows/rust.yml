@@ -127,7 +127,7 @@ jobs:
       - name: Publish
         # fix v1 to avoid update to node 20 because compatibility issues with
         # container `quay.io/pypa/manylinux2014_x86_64`
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           body: ${{ steps.changelog_reader.outputs.changes }}
