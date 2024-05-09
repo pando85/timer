@@ -119,7 +119,7 @@ jobs:
         id: changelog_reader
         # fix 2.2.2 to avoid update to node 20 because compatibility issues with
         # container `quay.io/pypa/manylinux2014_x86_64`
-        uses: mindsers/changelog-reader-action@v2.2.2
+        uses: mindsers/changelog-reader-action@v2.2.3
         with:
           version: v${{ env.PROJECT_VERSION }}
           path: ./CHANGELOG.md
