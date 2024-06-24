@@ -37,6 +37,7 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --edit-key $(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5) trust quit
 
       - name: Create new tag
         if: env.TAG_EXISTS == 'false'
@@ -44,5 +45,5 @@ jobs:
           tag=${{ steps.changelog_reader.outputs.version }}
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag -s "$tag" -m "$tag" --local-user $(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5)
+          git tag -s "$tag" -m "$tag" --local-user $(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5) <<< "$GPG_PASSPHRASE"
           git push origin "$tag"
