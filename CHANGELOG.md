@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.5](https://github.com/pando85/timer/tree/v0.7.5) - 2024-06-24
+
+### Build
+
+- Update Rust crate lazy_static to v1.5.0
+
+### CI
+
+- Fix gpg key for aur publish
+- Change AUR valid GPG
+
 ## [v0.7.4](https://github.com/pando85/timer/tree/v0.7.4) - 2024-06-21
 
 ### Build
