@@ -57,11 +57,10 @@ jobs:
       matrix:
         job:
           - { target: x86_64-apple-darwin, os: macos-12 }
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest, container: quay.io/pypa/manylinux2014_x86_64 }
+          # use ubuntu 20.04 to keep minimum glibc version to 2.31
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
-    # Use a container with GLIBC 2.17, make build compatible until that version
-    container: ${{ matrix.job.container }}
     steps:
       - uses: actions/checkout@v3
 
@@ -69,11 +68,10 @@ jobs:
         shell: bash
         run: |
           case ${{ matrix.job.target }} in
-            x86_64-unknown-linux-gnu) yum install -y alsa-lib-devel;;
+            x86_64-unknown-linux-gnu) sudo apt install -y libasound2-dev;;
           esac
 
       - uses: Swatinem/rust-cache@v2
-        if: ${{ matrix.job.container == null }}
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -117,16 +115,12 @@ jobs:
       - name: Get Changelog Entry
         if: startsWith(github.ref, 'refs/tags/')
         id: changelog_reader
-        # fix 2.2.2 to avoid update to node 20 because compatibility issues with
-        # container `quay.io/pypa/manylinux2014_x86_64`
         uses: mindsers/changelog-reader-action@v2.2.2
         with:
           version: v${{ env.PROJECT_VERSION }}
           path: ./CHANGELOG.md
 
       - name: Publish
-        # fix v1 to avoid update to node 20 because compatibility issues with
-        # container `quay.io/pypa/manylinux2014_x86_64`
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
