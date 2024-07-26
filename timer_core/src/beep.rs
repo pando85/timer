@@ -5,11 +5,11 @@ use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::mem::{size_of, MaybeUninit};
 use std::os::unix::io::AsRawFd;
+use std::sync::LazyLock;
 use std::thread::sleep;
 use std::time::Duration;
 
 use glob::glob;
-use lazy_static::lazy_static;
 #[cfg(target_os = "linux")]
 use libc::{c_void, input_event, write};
 use nix::ioctl_write_int_bad;
@@ -23,9 +23,7 @@ const SND_TONE: u16 = 0x02;
 const KIOCSOUND: u64 = 0x4B2F;
 const TIMER_FREQUENCY: u32 = 1193182;
 
-lazy_static! {
-    static ref DEVICE: Option<File> = get_device();
-}
+static DEVICE: LazyLock<Option<File>> = LazyLock::new(get_device);
 
 fn get_device() -> Option<File> {
     let strings_from_glob = |x| {
