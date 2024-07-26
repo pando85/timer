@@ -1,11 +1,10 @@
 use crate::figlet::Figlet;
 
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
+
 use time::Duration;
 
-lazy_static! {
-    static ref FIGLET: Figlet = Figlet::default();
-}
+static FIGLET: LazyLock<Figlet> = LazyLock::new(Figlet::default);
 
 #[cfg_attr(test, derive(Debug, PartialEq, Eq))]
 pub struct Time {
