@@ -8,11 +8,9 @@
       "always",
       [
         "build",
-        "ci",
         "docs",
         "feat",
         "fix",
-        "perf",
         "refactor",
         "release",
         "revert",
