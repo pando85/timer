@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add release.sh script
+- ci: Add release.sh script
 
 ### Fixed
 
-- Remove `fetch-depth: 0` to get just last commit on commitlint
-- Avoid Commitlint running twice
+- ci: Remove `fetch-depth: 0` to get just last commit on commitlint
+- ci: Avoid Commitlint running twice
 
 ### Documentation
 
@@ -22,32 +22,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Build
 
-- Update Rust crate rodio to 0.19.0
-- Update KSXGitHub/github-actions-deploy-aur action to v2.7.2
-- Update mindsers/changelog-reader-action action to v2.2.3
-- Update Rust crate clap to v4.5.10
-- Update softprops/action-gh-release action to v2
-- Update actions/checkout action to v4
-- Update Rust crate clap to v4.5.11
-- Update Rust crate clap to v4.5.12
-- Update Rust crate clap to v4.5.13
-- Update Rust crate regex to v1.10.6
-- Update wagoid/commitlint-github-action action to v6.0.2
-- Update Rust crate clap to v4.5.14
-- Update Rust crate clap to v4.5.15
-- Update Rust crate clap to v4.5.16
-- Update Rust crate libc to v0.2.156
-- Update Rust crate libc to v0.2.158
-- Update Rust crate crossterm to 0.28.0
-- Update KSXGitHub/github-actions-deploy-aur action to v3
+- **BREAKING**: Change required min glib version to 2.31
+- deps: Update Rust crate rodio to 0.19.0
+- deps: Update KSXGitHub/github-actions-deploy-aur action to v2.7.2
+- deps: Update mindsers/changelog-reader-action action to v2.2.3
+- deps: Update Rust crate clap to v4.5.10
+- deps: Update softprops/action-gh-release action to v2
+- deps: Update actions/checkout action to v4
+- deps: Update Rust crate clap to v4.5.11
+- deps: Update Rust crate clap to v4.5.12
+- deps: Update Rust crate clap to v4.5.13
+- deps: Update Rust crate regex to v1.10.6
+- deps: Update wagoid/commitlint-github-action action to v6.0.2
+- deps: Update Rust crate clap to v4.5.14
+- deps: Update Rust crate clap to v4.5.15
+- deps: Update Rust crate clap to v4.5.16
+- deps: Update Rust crate libc to v0.2.156
+- deps: Update Rust crate libc to v0.2.158
+- deps: Update Rust crate crossterm to 0.28.0
+- deps: Update KSXGitHub/github-actions-deploy-aur action to v3
 
 ### Refactor
 
 - Replace lazy_static with std from 1.80
-
-### Ci
-
-- Change required min glib version to 2.31
 
 ## [v0.7.5](https://github.com/pando85/timer/tree/v0.7.5) - 2024-06-24
 
