@@ -19,11 +19,22 @@ body = """
 {% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits
+    | filter(attribute="scope")
+    | sort(attribute="scope") %}
+        - {{commit.scope}}: {{ commit.message | upper_first }}
+        {%- if commit.breaking %}
+        {% raw %}  {% endraw %}- **BREAKING**: {{commit.breaking_description}}
+        {%- endif -%}
+    {%- endfor -%}
     {% for commit in commits %}
-    - {{ commit.message | upper_first }}
-    {%- if commit.breaking %}
-    {% raw %}  {% endraw %}- **BREAKING**: {{commit.breaking_description}}
-    {%- endif -%}
+        {%- if commit.scope %}
+        {%- else %}
+            - {{ commit.message | upper_first }}
+            {%- if commit.breaking %}
+            {% raw %}  {% endraw %}- **BREAKING**: {{commit.breaking_description}}
+            {%- endif -%}
+        {%- endif -%}
     {%- endfor -%}
     {% raw %}\n{% endraw %}\
 {% endfor %}\n
