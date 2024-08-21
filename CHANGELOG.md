@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.6](https://github.com/pando85/timer/tree/v0.7.6) - 2024-08-21
+
+### Added
+
+- Add release.sh script
+
+### Fixed
+
+- Remove `fetch-depth: 0` to get just last commit on commitlint
+- Avoid Commitlint running twice
+
+### Documentation
+
+- Order changelog groups
+
+### Build
+
+- Update Rust crate rodio to 0.19.0
+- Update KSXGitHub/github-actions-deploy-aur action to v2.7.2
+- Update mindsers/changelog-reader-action action to v2.2.3
+- Update Rust crate clap to v4.5.10
+- Update softprops/action-gh-release action to v2
+- Update actions/checkout action to v4
+- Update Rust crate clap to v4.5.11
+- Update Rust crate clap to v4.5.12
+- Update Rust crate clap to v4.5.13
+- Update Rust crate regex to v1.10.6
+- Update wagoid/commitlint-github-action action to v6.0.2
+- Update Rust crate clap to v4.5.14
+- Update Rust crate clap to v4.5.15
+- Update Rust crate clap to v4.5.16
+- Update Rust crate libc to v0.2.156
+- Update Rust crate libc to v0.2.158
+- Update Rust crate crossterm to 0.28.0
+- Update KSXGitHub/github-actions-deploy-aur action to v3
+
+### Refactor
+
+- Replace lazy_static with std from 1.80
+
+### Ci
+
+- Change required min glib version to 2.31
+
 ## [v0.7.5](https://github.com/pando85/timer/tree/v0.7.5) - 2024-06-24
 
 ### Build
