@@ -31,11 +31,6 @@ test: lint
 update-changelog:	## automatically update changelog based on commits
 	git cliff -t v$(PROJECT_VERSION) -u -p CHANGELOG.md
 
-.PHONY: tag
-tag:	## create a tag using version from Cargo.toml
-	git tag -s v$(PROJECT_VERSION)  -m "v$(PROJECT_VERSION)" && \
-	git push origin v$(PROJECT_VERSION)
-
 .PHONY: release
 release:	## generate vendor.tar.gz and $(PKG_BASE_NAME).tar.gz
 	cargo vendor
