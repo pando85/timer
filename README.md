@@ -26,10 +26,11 @@ Simple count down terminal alarm.
 
 ## Features
 
-- Multiple input options
+- Parse multiple input options
 - Play sound when finished (Beep included!)
 - Send terminal bell
 - Big centered output
+- Repeat countdown infinitely
 
 ## Installation
 
