@@ -104,7 +104,7 @@ jobs:
           echo "::set-output name=PKG_BASE_NAME::${PKG_BASE_NAME}"
 
       - name: Publish crates
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && matrix.job.target == 'x86_64-unknown-linux-gnu'
         env:
           CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
         shell: bash
