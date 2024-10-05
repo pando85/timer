@@ -1,7 +1,17 @@
-use timer_core::beep::beep;
-use timer_core::opts::Opts;
-use timer_core::timer;
-use timer_core::ui;
+mod beep;
+mod constants;
+mod figlet;
+mod opts;
+mod sound;
+mod time;
+mod timer;
+mod ui;
+mod utils;
+
+extern crate time as time_crate;
+
+use crate::beep::beep;
+use crate::opts::Opts;
 
 use std::io;
 use std::process::exit;
@@ -10,7 +20,9 @@ use std::time::Duration;
 
 use clap::{CommandFactory, Parser};
 use signal_hook::{consts::signal::*, iterator::Signals};
-use time::OffsetDateTime;
+use time_crate::OffsetDateTime;
+
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 fn parse_time(input_time: &str) -> Option<OffsetDateTime> {
     match timer::parse_counter_time(input_time) {

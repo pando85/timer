@@ -1087,7 +1087,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "timer_core"
+name = "timer-cli"
 version = "0.7.6"
 dependencies = [
  "cargo-husky",

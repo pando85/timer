@@ -1,7 +1,7 @@
 CARGO_TARGET_DIR ?= target
 CARGO_TARGET ?= x86_64-unknown-linux-gnu
 PKG_BASE_NAME ?= timer-${CARGO_TARGET}
-PROJECT_VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1)
+PROJECT_VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' ./Cargo.toml | head -n1)
 
 .DEFAULT: help
 .PHONY: help
@@ -40,9 +40,5 @@ release:	## generate vendor.tar.gz and $(PKG_BASE_NAME).tar.gz
 	@echo Released in $(CARGO_TARGET_DIR)/$(CARGO_TARGET)/release/timer
 
 .PHONY: publish
-publish:	## publish crates
-	@for package in $(shell find . -mindepth 2 -not -path './vendor/*' -name Cargo.toml -exec dirname {} \; | sort -r);do \
-		cd $$package; \
-		cargo publish; \
-		cd -; \
-	done;
+publish:	## publish crate
+	cargo publish

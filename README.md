@@ -36,7 +36,7 @@ Simple count down terminal alarm.
 ### Cargo
 
 ```bash
-cargo install timer_core
+cargo install timer-cli
 ```
 
 ### Archlinux
