@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.0](https://github.com/pando85/timer/tree/v0.8.0) - 2024-10-05
+
+### Fixed
+
+- ci: Add groups to cliff template
+
+### Documentation
+
+- Minor change in features list
+
+### Build
+
+- deps: Update wagoid/commitlint-github-action action to v6.1.1
+- deps: Update KSXGitHub/github-actions-deploy-aur action to v3.0.1
+- deps: Update wagoid/commitlint-github-action action to v6.1.2
+- deps: Change clippy to clechasseur/rs-clippy-check action to v3
+- deps: Update Rust crate clap to v4.5.17
+- deps: Remove pinned versions from `Cargo.toml`
+- deps: Update Rust crate clap to v4.5.18
+- deps: Update Rust crate regex to v1.11.0
+- deps: Update Rust crate clap to v4.5.19
+- Remove death code
+
+### Refactor
+
+- ci: Change comments in `release.sh`
+- Simplify directory structure
+
 ## [v0.7.6](https://github.com/pando85/timer/tree/v0.7.6) - 2024-08-21
 
 ### Added
