@@ -14,7 +14,7 @@ jobs:
     - name: Extract crate information
       shell: bash
       run: |
-        echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' timer_core/Cargo.toml | head -n1)" >> $GITHUB_ENV
+        echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./Cargo.toml | head -n1)" >> $GITHUB_ENV
 
     - name: Create PKGBUILD
       shell: bash

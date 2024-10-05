@@ -1,7 +1,3 @@
-use std::fs::read_to_string;
-use std::io;
-use std::path::Path;
-
 const CHAR_OFFSET: usize = 32;
 
 #[derive(Debug, Clone)]
@@ -34,25 +30,9 @@ impl Figlet {
         output.join("\n")
     }
 
-    pub fn from_file(path: impl AsRef<Path>) -> Result<Self, io::Error> {
-        let contents = read_to_string(path)?;
-        parse(contents.lines()).ok_or_else(|| {
-            io::Error::new(
-                io::ErrorKind::Other,
-                "file exists but appears to be invalid",
-            )
-        })
-    }
-
     fn from_default() -> Self {
         let contents = include_str!("univers.flf");
         parse(contents.lines()).expect("embedded font should be parsable")
-    }
-
-    /// Returns the height of the largest character in the font.
-    /// This operation is very fast.
-    pub fn height(&self) -> usize {
-        self.height
     }
 }
 
