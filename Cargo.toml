@@ -40,3 +40,4 @@ features = ["user-hooks"]
 codegen-units = 1
 lto = "fat"
 panic = "abort"
+strip = "symbols"
