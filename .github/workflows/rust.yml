@@ -48,7 +48,6 @@ jobs:
 
       - uses: clechasseur/rs-clippy-check@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features -- --deny warnings
 
   build:
