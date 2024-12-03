@@ -177,11 +177,6 @@ mod tests {
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time() {
-        // Workaround `OffsetDateTime::now_local()` failing in tests:
-        // https://github.com/time-rs/time/blob/main/CHANGELOG.md#0318-2023-02-16
-        unsafe {
-            time::util::local_offset::set_soundness(time::util::local_offset::Soundness::Unsound);
-        }
         let now = OffsetDateTime::now_local().ok().unwrap();
 
         let date = parse_end_time("12:00").unwrap();
@@ -194,11 +189,6 @@ mod tests {
     #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time_leading_zero() {
-        // Workaround `OffsetDateTime::now_local()` failing in tests:
-        // https://github.com/time-rs/time/blob/main/CHANGELOG.md#0318-2023-02-16
-        unsafe {
-            time::util::local_offset::set_soundness(time::util::local_offset::Soundness::Unsound);
-        }
         let now = OffsetDateTime::now_local().ok().unwrap();
 
         let date = parse_end_time("9:30").unwrap();
