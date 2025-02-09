@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.3](https://github.com/pando85/timer/tree/v0.8.3) - 2025-02-09
+
+### Fixed
+
+- ci: Clippy Github Action name typo
+- ci: Remove `token` deprecated attr from `rs-clippy-check`
+- ci: Update deprecated `macos-12` runner for `macos-13`
+- Remove deprecated `set_soundness` from time 0.3.37
+
+### Build
+
+- deps: Update Rust crate clap to v4.5.20
+- deps: Update Rust crate libc to v0.2.160
+- deps: Update Rust crate libc to v0.2.161
+- deps: Update Rust crate regex to v1.11.1
+- deps: Update Rust crate rodio to 0.20.0
+- deps: Update Rust crate rodio to v0.20.1
+- deps: Update Rust crate clap to v4.5.21
+- deps: Update Rust crate libc to v0.2.167
+- deps: Update Rust crate time to v0.3.37
+- deps: Keep versions to minor in `Cargo.toml`
+- deps: Update Rust crate clap to v4.5.22
+- deps: Update Rust crate clap to v4.5.23
+- deps: Update Rust crate libc to v0.2.168
+- deps: Update wagoid/commitlint-github-action action to v6.2.0
+- deps: Update Rust crate clap to v4.5.24
+- deps: Update Rust crate clap to v4.5.25
+- deps: Update Rust crate clap to v4.5.26
+- deps: Update clechasseur/rs-clippy-check action to v4
+- deps: Update wagoid/commitlint-github-action action to v6.2.1
+- deps: Update Rust crate clap to v4.5.27
+- deps: Update Rust crate libc to v0.2.169
+- deps: Update Rust crate glob to v0.3.2
+- deps: Update Rust crate clap to v4.5.28
+
 ## [v0.8.2](https://github.com/pando85/timer/tree/v0.8.2) - 2024-10-06
 
 ### Build
