@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.5](https://github.com/pando85/timer/tree/v0.8.5) - 2025-02-18
+
+### Build
+
+- deps: Update Rust crate clap to v4.5.29
+- deps: Update Rust crate clap to v4.5.30
+- deps: Update KSXGitHub/github-actions-deploy-aur action to v4
+
 ## [v0.8.4](https://github.com/pando85/timer/tree/v0.8.4) - 2025-02-09
 
 ### Build
