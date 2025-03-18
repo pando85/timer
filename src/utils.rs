@@ -1,6 +1,6 @@
 use crate::Result;
 
-use std::sync::mpsc::{channel, Receiver};
+use std::sync::mpsc::{Receiver, channel};
 use std::thread;
 use std::time::Duration;
 

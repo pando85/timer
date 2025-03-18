@@ -1,3 +1,4 @@
+use crate::Result;
 use crate::beep::beep;
 use crate::constants::{
     BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, PLAY_TIMEOUT, SOUND_START_DELAY,
@@ -6,7 +7,6 @@ use crate::opts::Opts;
 use crate::sound::Sound;
 use crate::ui;
 use crate::utils::spawn_thread;
-use crate::Result;
 
 use std::io;
 use std::thread::sleep;
@@ -14,7 +14,7 @@ use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
 use tailcall::tailcall;
-use time::{format_description, Duration, OffsetDateTime, Time};
+use time::{Duration, OffsetDateTime, Time, format_description};
 
 pub const BELL_CHART: char = '';
 
