@@ -1,4 +1,4 @@
-use clap::{crate_authors, crate_description, crate_version, ArgAction, Parser};
+use clap::{ArgAction, Parser, crate_authors, crate_description, crate_version};
 
 #[derive(Parser)]
 #[command(

@@ -1,5 +1,5 @@
-use crate::time::Time;
 use crate::Result;
+use crate::time::Time;
 
 use std::io;
 

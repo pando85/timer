@@ -2,7 +2,7 @@ use crate::Result;
 
 use std::io::{BufReader, Cursor};
 
-use rodio::{source::Source, Decoder, OutputStream, OutputStreamHandle};
+use rodio::{Decoder, OutputStream, OutputStreamHandle, source::Source};
 
 pub struct Sound {
     _stream: OutputStream,

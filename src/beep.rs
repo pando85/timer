@@ -3,7 +3,7 @@ use crate::Result;
 use std::error::Error;
 use std::fmt;
 use std::fs::{File, OpenOptions};
-use std::mem::{size_of, MaybeUninit};
+use std::mem::{MaybeUninit, size_of};
 use std::os::unix::io::AsRawFd;
 use std::sync::LazyLock;
 use std::thread::sleep;
