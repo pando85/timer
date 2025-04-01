@@ -2,7 +2,7 @@
 name = "timer-cli"
 description = "Simple countdown terminal alarm"
 authors = ["Pando85 <pando855@gmail.com>"]
-version = "0.8.8"
+version = "0.8.9"
 edition = "2024"
 license-file = "./LICENSE"
 homepage = "https://github.com/pando85/timer"
