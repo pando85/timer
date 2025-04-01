@@ -16,5 +16,5 @@ source=("https://github.com/pando85/timer/releases/download/v${pkgver}/timer-${p
 sha256sums=('{{ checksum }}')
 
 package() {
-	install -Dm755 ${_pkgname} "${pkgdir}/usr/bin/${_pkgname}"
+	install -Dm755 timer "${pkgdir}/usr/bin/timer"
 }
