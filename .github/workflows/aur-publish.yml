@@ -18,8 +18,9 @@ jobs:
         package:
           - name: timer-rs
             pkgbuild: PKGBUILD
-          - name: timer-rs-bin
-            pkgbuild: PKGBUILD-bin
+          # Enable after taking ownership
+          # - name: timer-rs-bin
+          #   pkgbuild: PKGBUILD-bin
 
     steps:
     - uses: actions/checkout@v4
