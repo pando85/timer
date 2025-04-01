@@ -1087,7 +1087,7 @@ dependencies = [
 
 [[package]]
 name = "timer-cli"
-version = "0.8.5"
+version = "0.8.6"
 dependencies = [
  "cargo-husky",
  "clap",

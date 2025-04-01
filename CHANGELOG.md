@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.6](https://github.com/pando85/timer/tree/v0.8.6) - 2025-04-01
+
+### Build
+
+- ci: Add sha256sum to release binaries
+- ci: Change from main to master
+- ci: Add AUR bin package
+- deps: Update Rust crate libc to v0.2.170
+- deps: Update Rust crate clap to v4.5.31
+- deps: Update Rust crate time to v0.3.39
+- deps: Update Rust crate clap to v4.5.32
+- deps: Update Rust crate libc to v0.2.171
+- deps: Update Rust crate clap to v4.5.33
+- deps: Update Rust crate clap to v4.5.34
+- Update to 2024 edition
+
 ## [v0.8.5](https://github.com/pando85/timer/tree/v0.8.5) - 2025-02-18
 
 ### Build
