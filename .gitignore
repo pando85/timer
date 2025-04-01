@@ -16,4 +16,6 @@
 vendor
 vendor.tar.gz
 timer-*.tar.gz
+timer-*.tar.gz.sha256
 PKGBUILD
+PKGBUILD-bin
