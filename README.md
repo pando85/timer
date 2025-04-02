@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/pando85/timer/main/assets/logo.svg" alt="logo" width="200">
+  <img src="https://raw.githubusercontent.com/pando85/timer/master/assets/logo.svg" alt="logo" width="200">
   <br>
   Timer
   <br>
@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/pando85/timer/main/assets/demo.gif" alt="demo">
+  <img src="https://raw.githubusercontent.com/pando85/timer/master/assets/demo.gif" alt="demo">
 </p>
 
 ![Build status](https://img.shields.io/github/actions/workflow/status/pando85/timer/rust.yml?branch=main)
@@ -19,7 +19,7 @@ Simple count down terminal alarm.
 - [Features](#features)
 - [Installation](#installation)
   - [Cargo](#cargo)
-  - [Archlinux](#archlinux)
+  - [Arch Linux](#arch-linux)
   - [Binaries](#binaries)
 - [Beep](#beep)
 - [Terminal bell](#terminal-bell)
@@ -40,13 +40,13 @@ Simple count down terminal alarm.
 cargo install timer-cli
 ```
 
-### Archlinux
+### Arch Linux
 
 ```bash
 yay -S timer-rs
 ```
 
-or the binary from the AUR:
+or the binary from AUR:
 
 ```bash
 yay -S timer-rs-bin
