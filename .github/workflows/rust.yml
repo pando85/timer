@@ -56,8 +56,8 @@ jobs:
       matrix:
         job:
           - { target: x86_64-apple-darwin, os: macos-13 }
-          # use ubuntu 20.04 to keep minimum glibc version to 2.31
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
+          # use ubuntu 22.04 to keep older glibc version dependency
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04 }
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
     steps:
