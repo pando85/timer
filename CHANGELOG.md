@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.10](https://github.com/pando85/timer/tree/v0.8.10) - 2025-06-15
+
+### Added
+
+- ci: Add pre-commit and deprecate cargo-husky
+
+### Fixed
+
+- ci: Disable rust jobs in pre-commit workflows
+
+### Documentation
+
+- Update README with `timer-rs-bin` package and fix curl install
+- Fix logo links in README
+
+### Build
+
+- ci: Update ubuntu runners
+- deps: Update Rust crate crossterm to 0.29
+- deps: Update Rust crate clap to v4.5.36
+- deps: Update Rust crate clap to v4.5.37
+- deps: Update Rust crate libc to v0.2.172
+- deps: Update Rust crate nix to 0.30
+- deps: Update Rust crate nix to v0.30.1
+- deps: Update Rust crate clap to v4.5.38
+- deps: Update Rust crate clap to v4.5.39
+- deps: Update Rust crate clap to v4.5.40
+- deps: Update Rust crate signal-hook to v0.3.18
+- deps: Update Rust crate libc to v0.2.173
+
 ## [v0.8.9](https://github.com/pando85/timer/tree/v0.8.9) - 2025-04-01
 
 ### Build
