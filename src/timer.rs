@@ -121,7 +121,7 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
         counter if counter <= Duration::ZERO => {
             ui::draw(w, Duration::ZERO)?;
             if opts.terminal_bell {
-                println!("{}", BELL_CHART);
+                println!("{BELL_CHART}");
             }
 
             let mut result = Ok(());

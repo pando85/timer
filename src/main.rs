@@ -41,7 +41,7 @@ fn handle_countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) {
         }
         Err(e) => {
             ui::restore_terminal(w).unwrap();
-            eprintln!("Error: {:?}", e);
+            eprintln!("Error: {e:?}");
         }
     };
 }
