@@ -49,7 +49,7 @@ struct DeviceError;
 
 impl fmt::Display for DeviceError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "No device found in: {:?}", DEVICE_PATHS)
+        write!(f, "No device found in: {DEVICE_PATHS:?}")
     }
 }
 

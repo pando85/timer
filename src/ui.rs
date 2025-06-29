@@ -23,7 +23,7 @@ where
         cursor::MoveTo(0, 0),
         terminal::Clear(terminal::ClearType::All),
     )?;
-    println!("{}", s);
+    println!("{s}");
     Ok(())
 }
 
