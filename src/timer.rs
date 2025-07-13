@@ -130,8 +130,7 @@ fn play_sound() -> Result<()> {
 
     for _ in 0..BEEP_REPETITIONS {
         sound.play()?;
-        sleep(stdDuration::from_millis(BEEP_DURATION));
-        sleep(stdDuration::from_millis(BEEP_DELAY))
+        sleep(stdDuration::from_millis(BEEP_DELAY));
     }
     Ok(())
 }
