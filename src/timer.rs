@@ -167,7 +167,6 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
 mod tests {
     use super::*;
 
-    #[cfg(not(target_os = "macos"))]
     use time::macros::time;
 
     #[test]
