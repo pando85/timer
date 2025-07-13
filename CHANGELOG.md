@@ -2,8 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.9.0](https://github.com/pando85/timer/tree/v0.9.0) - 2025-07-13
+
+### Added
+
+- Add hms parser
+
+### Fixed
+
+- ci: Fix SHA256 URL on AUR pkgbuild generator
+- Cargo clippy errors 1.88
+
+### Build
+
+- ci: Update AUR rash script with uri module
+- ci: Auto update renovate pre-commit once a month automatically
+- deps: Update Rust crate libc to v0.2.174
+- deps: Update Rust crate clap to v4.5.41
+- deps: Update Rust crate rodio to 0.21
+- deps: Update API of rodio 0.21
+
+### Testing
+
+- ci: Deprecate commitlint workflow
+- Re-add macos timer unit tests
+- Fix macos undefined `time` macro
 
 ## [v0.8.10](https://github.com/pando85/timer/tree/v0.8.10) - 2025-06-15
 
