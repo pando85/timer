@@ -56,6 +56,32 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
 }
 
 pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
+    // Try to parse with hours, minutes, and seconds (with optional fractional seconds)
+    if let Ok(format) = format_description::parse("[hour]:[minute]:[second].[subsecond]") {
+        if let Ok(end_time) = Time::parse(s, &format) {
+            let now = OffsetDateTime::now_local().ok()?;
+            let (h, m, s) = now.to_hms();
+            let end_date = if Time::from_hms(h, m, s).ok()? >= end_time {
+                now + Duration::days(1)
+            } else {
+                now
+            };
+            return Some(end_date.replace_time(end_time));
+        }
+    }
+    if let Ok(format) = format_description::parse("[hour]:[minute]:[second]") {
+        if let Ok(end_time) = Time::parse(s, &format) {
+            let now = OffsetDateTime::now_local().ok()?;
+            let (h, m, s) = now.to_hms();
+            let end_date = if Time::from_hms(h, m, s).ok()? >= end_time {
+                now + Duration::days(1)
+            } else {
+                now
+            };
+            return Some(end_date.replace_time(end_time));
+        }
+    }
+    // Fallback to [hour]:[minute]
     let format = format_description::parse("[hour]:[minute]").ok()?;
     let now = OffsetDateTime::now_local().ok()?;
     let end_time = Time::parse(s, &format)
@@ -194,5 +220,25 @@ mod tests {
         let date = parse_end_time("9:30").unwrap();
         let expected_date = now.replace_time(time!(9:30));
         assert_eq!(date.to_hms(), expected_date.to_hms());
+    }
+
+    // macos is not able to build with `unsound_local_offset` feature:
+    // https://github.com/time-rs/time/issues/408
+    #[cfg(not(target_os = "macos"))]
+    #[test]
+    fn test_parse_end_time_hms() {
+        let now = OffsetDateTime::now_local().ok().unwrap();
+        let date = parse_end_time("13:45:43").unwrap();
+        let expected_date = now.replace_time(time!(13:45:43));
+        assert_eq!(date.to_hms(), expected_date.to_hms());
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    #[test]
+    fn test_parse_end_time_hms_milli() {
+        let now = OffsetDateTime::now_local().ok().unwrap();
+        let date = parse_end_time("13:45:43.123").unwrap();
+        let expected_date = now.replace_time(time!(13:45:43.123));
+        assert_eq!(date.to_hms_milli(), expected_date.to_hms_milli());
     }
 }
