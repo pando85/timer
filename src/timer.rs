@@ -167,7 +167,6 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
 mod tests {
     use super::*;
 
-    #[cfg(not(target_os = "macos"))]
     use time::macros::time;
 
     #[test]
@@ -198,9 +197,6 @@ mod tests {
         assert_eq!(None, parse_counter_time("10:00"));
     }
 
-    // macos is not able to build with `unsound_local_offset` feature:
-    // https://github.com/time-rs/time/issues/408
-    #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time() {
         let now = OffsetDateTime::now_local().ok().unwrap();
@@ -210,9 +206,6 @@ mod tests {
         assert_eq!(date.to_hms(), expected_date.to_hms());
     }
 
-    // macos is not able to build with `unsound_local_offset` feature:
-    // https://github.com/time-rs/time/issues/408
-    #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time_leading_zero() {
         let now = OffsetDateTime::now_local().ok().unwrap();
@@ -222,9 +215,6 @@ mod tests {
         assert_eq!(date.to_hms(), expected_date.to_hms());
     }
 
-    // macos is not able to build with `unsound_local_offset` feature:
-    // https://github.com/time-rs/time/issues/408
-    #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time_hms() {
         let now = OffsetDateTime::now_local().ok().unwrap();
@@ -233,7 +223,6 @@ mod tests {
         assert_eq!(date.to_hms(), expected_date.to_hms());
     }
 
-    #[cfg(not(target_os = "macos"))]
     #[test]
     fn test_parse_end_time_hms_milli() {
         let now = OffsetDateTime::now_local().ok().unwrap();
