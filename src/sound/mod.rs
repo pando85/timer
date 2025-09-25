@@ -1,16 +1,20 @@
+#[cfg(not(feature = "test-beep"))]
 use crate::Result;
-
+#[cfg(not(feature = "test-beep"))]
+use rodio::mixer::Mixer;
+#[cfg(not(feature = "test-beep"))]
+use rodio::stream::{OutputStream, OutputStreamBuilder};
+#[cfg(not(feature = "test-beep"))]
 use std::io::Cursor;
 
-use rodio::mixer::Mixer;
-use rodio::stream::{OutputStream, OutputStreamBuilder};
-
+#[cfg(not(feature = "test-beep"))]
 pub struct Sound {
     _stream: OutputStream,
     mixer: Mixer,
     cursor: Cursor<&'static [u8; 5943]>,
 }
 
+#[cfg(not(feature = "test-beep"))]
 impl Sound {
     pub fn new() -> Result<Self> {
         let stream = OutputStreamBuilder::open_default_stream()?;

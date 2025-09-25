@@ -54,6 +54,15 @@ test:	## run tests
 test: lint
 	cargo test
 
+.PHONY: test-beep
+test-beep: ## run tests with test-beep feature (instrumented beep logging)
+test-beep: lint
+	cargo test --features test-beep
+
+.PHONY: test-all
+test-all: ## run both default and test-beep feature test suites
+test-all: test test-beep
+
 .PHONY: update-changelog
 update-changelog:	## automatically update changelog based on commits
 	git cliff -t v$(PROJECT_VERSION) -u -p CHANGELOG.md

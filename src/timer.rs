@@ -1,11 +1,13 @@
 use crate::Result;
 use crate::beep::beep;
-use crate::constants::{
-    BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, PLAY_TIMEOUT, SOUND_START_DELAY,
-};
+#[cfg(not(feature = "test-beep"))]
+use crate::constants::PLAY_TIMEOUT;
+use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, SOUND_START_DELAY};
 use crate::opts::Opts;
+#[cfg(not(feature = "test-beep"))]
 use crate::sound::Sound;
 use crate::ui;
+#[cfg(not(feature = "test-beep"))]
 use crate::utils::spawn_thread;
 
 use std::io;
@@ -125,6 +127,7 @@ fn play_beep() -> Result<()> {
     Ok(())
 }
 
+#[cfg(not(feature = "test-beep"))]
 fn play_sound() -> Result<()> {
     let sound = Sound::new()?;
 
@@ -149,14 +152,24 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
                 println!("{BELL_CHART}");
             }
 
-            let mut result = Ok(());
             if !opts.silence {
-                // error cannot be printed because we restore the terminal after this
-                let handler_with_timeout = spawn_thread(|| play_sound().unwrap());
-                play_beep()?;
-                result = handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
+                // Under normal builds we play a sound in parallel and join with timeout.
+                // Under the test-beep feature we skip spawning the audio thread (CI environments
+                // may lack audio devices and return WouldBlock) but still exercise the beep path
+                // to populate the in-memory log.
+                #[cfg(not(feature = "test-beep"))]
+                {
+                    // error cannot be printed because we restore the terminal after this
+                    let handler_with_timeout = spawn_thread(|| play_sound().unwrap());
+                    play_beep()?;
+                    return handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT));
+                }
+                #[cfg(feature = "test-beep")]
+                {
+                    play_beep()?;
+                }
             }
-            result
+            Ok(())
         }
         _ => unreachable!(),
     }
@@ -166,7 +179,41 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
 mod tests {
     use super::*;
 
+    #[cfg(feature = "test-beep")]
+    use crate::beep::{__beep_log_clear, __beep_log_snapshot};
     use time::macros::time;
+
+    #[cfg(feature = "test-beep")]
+    #[test]
+    fn countdown_triggers_expected_beep_cycles() {
+        __beep_log_clear();
+        // Construct end time already passed so countdown enters alarm branch immediately.
+        let end = OffsetDateTime::now_utc() - Duration::seconds(1);
+        let opts = Opts {
+            r#loop: false,
+            silence: false,
+            terminal_bell: false,
+            time: vec!["0".to_string()],
+        };
+        // Use a sink writer; we only care about side effects.
+        let mut sink = Vec::<u8>::new();
+        // This will invoke play_beep() which calls our feature-gated logger.
+        countdown(&mut sink, end, &opts).unwrap();
+        let log = __beep_log_snapshot();
+        // Each repetition => (freq, 0)
+        assert_eq!(
+            log.len(),
+            BEEP_REPETITIONS * 2,
+            "Unexpected beep log length: {:?}",
+            log
+        );
+        for pair in log.chunks(2) {
+            assert_eq!(
+                pair[1], 0,
+                "Second element of each beep pair must be 0 (stop)"
+            );
+        }
+    }
 
     #[test]
     fn test_parse_counter_time() {

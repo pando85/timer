@@ -79,6 +79,19 @@ long-lived threads beyond countdown + ephemeral alarm.
 Add tests for new parse variants, FIGLET fallback (simulate tiny term by forcing non-centered path),
 rounding boundaries (<1s, ms to s). Do not attempt real audio/beep in CI.
 
+Feature `test-beep` provides deterministic in-memory logging of beep frequency pairs (start, 0) to
+validate alarm sequencing without touching real devices. Use:
+
+```
+make test-beep
+```
+
+Or run both suites:
+
+```
+make test-all
+```
+
 ## Error & Signal Safety
 
 Always call `ui::restore_terminal` on early exit or error. Signal handler minimal: redraw on
@@ -113,6 +126,8 @@ countdown accuracy above micro-optimizations. Tail recursion stays unless broken
 - Format: `make fmt`
 - Lint: `make clippy`
 - Test: `make test`
+- Test (instrumented beep): `make test-beep`
+- Test all (default + instrumented): `make test-all`
 - Run sample: `cargo run -- -s 25`
 - Loop sample: `cargo run -- --loop -s 10s`
 - Release: `make release`

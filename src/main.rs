@@ -8,6 +8,9 @@ mod timer;
 mod ui;
 mod utils;
 
+#[cfg(test)]
+mod constants_tests;
+
 extern crate time as time_crate;
 
 use crate::beep::beep;

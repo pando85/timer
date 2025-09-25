@@ -1,122 +1,157 @@
 use crate::Result;
-
-use std::error::Error;
-use std::fmt;
-use std::fs::{File, OpenOptions};
-use std::mem::{MaybeUninit, size_of};
-use std::os::unix::io::AsRawFd;
-use std::sync::LazyLock;
 use std::thread::sleep;
 use std::time::Duration;
 
-use glob::glob;
-#[cfg(target_os = "linux")]
-use libc::{c_void, input_event, write};
-use nix::ioctl_write_int_bad;
+// Production hardware beep implementation
+#[cfg(not(feature = "test-beep"))]
+mod hardware {
+    use super::{Duration, Result, sleep};
+    use std::error::Error;
+    use std::fmt;
+    use std::fs::{File, OpenOptions};
+    use std::os::unix::io::AsRawFd;
+    use std::sync::LazyLock;
 
-const DEVICE_PATHS: [&str; 2] = [
-    "/dev/input/by-path/platform-pcspkr-event-spkr",
-    "/dev/console",
-];
-const EV_SND: u16 = 0x12;
-const SND_TONE: u16 = 0x02;
-const KIOCSOUND: u64 = 0x4B2F;
-const TIMER_FREQUENCY: u32 = 1193182;
+    use glob::glob;
 
-static DEVICE: LazyLock<Option<File>> = LazyLock::new(get_device);
+    #[cfg(target_os = "linux")]
+    use libc::{c_void, input_event, write};
+    #[cfg(target_os = "linux")]
+    use nix::ioctl_write_int_bad;
+    #[cfg(target_os = "linux")]
+    use std::mem::{MaybeUninit, size_of};
 
-fn get_device() -> Option<File> {
-    let strings_from_glob = |x| {
-        glob(x)
-            .unwrap()
-            .map(|x| x.unwrap().to_str().unwrap().to_string())
-            .collect::<Vec<String>>()
-    };
-    let all_ttys = strings_from_glob("/dev/tty[0-9]*");
-    let all_vcs = strings_from_glob("/dev/vc/[0-9]*");
-    DEVICE_PATHS
-        .into_iter()
-        .map(|s| s.to_string())
-        .chain(all_ttys)
-        .chain(all_vcs)
-        .find_map(|d| OpenOptions::new().append(true).open(d).ok())
-}
+    const DEVICE_PATHS: [&str; 2] = [
+        "/dev/input/by-path/platform-pcspkr-event-spkr",
+        "/dev/console",
+    ];
 
-ioctl_write_int_bad!(kiocsound, KIOCSOUND);
+    #[cfg(target_os = "linux")]
+    const EV_SND: u16 = 0x12;
+    #[cfg(target_os = "linux")]
+    const SND_TONE: u16 = 0x02;
+    #[cfg(target_os = "linux")]
+    const KIOCSOUND: u64 = 0x4B2F;
 
-#[derive(Debug, Clone)]
-struct DeviceError;
+    const TIMER_FREQUENCY: u32 = 1193182;
 
-impl fmt::Display for DeviceError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "No device found in: {DEVICE_PATHS:?}")
+    static DEVICE: LazyLock<Option<File>> = LazyLock::new(get_device);
+
+    fn get_device() -> Option<File> {
+        let strings_from_glob = |x| {
+            glob(x)
+                .unwrap()
+                .map(|x| x.unwrap().to_str().unwrap().to_string())
+                .collect::<Vec<String>>()
+        };
+        let all_ttys = strings_from_glob("/dev/tty[0-9]*");
+        let all_vcs = strings_from_glob("/dev/vc/[0-9]*");
+        DEVICE_PATHS
+            .into_iter()
+            .map(|s| s.to_string())
+            .chain(all_ttys)
+            .chain(all_vcs)
+            .find_map(|d| OpenOptions::new().append(true).open(d).ok())
     }
-}
 
-impl Error for DeviceError {}
+    #[cfg(target_os = "linux")]
+    ioctl_write_int_bad!(kiocsound, KIOCSOUND);
 
-struct Driver {
-    device: &'static File,
-    beep: fn(dev: &File, freq: i32) -> nix::Result<()>,
-}
+    #[derive(Debug, Clone)]
+    struct DeviceError;
 
-impl Driver {
-    pub fn beep(&self, freq: i32) -> nix::Result<()> {
-        (self.beep)(self.device, freq)
+    impl fmt::Display for DeviceError {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "No device found: {DEVICE_PATHS:?}")
+        }
     }
-}
 
-#[cfg(target_os = "linux")]
-fn driver_evdev(dev: &File, freq: i32) -> nix::Result<()> {
-    unsafe {
-        let mut e = MaybeUninit::<input_event>::zeroed().assume_init();
-        e.type_ = EV_SND;
-        e.code = SND_TONE;
-        e.value = freq;
+    impl Error for DeviceError {}
 
-        let e_ptr: *mut c_void = &mut e as *mut _ as *mut c_void;
-        write(dev.as_raw_fd(), e_ptr, size_of::<input_event>());
+    struct Driver {
+        device: &'static File,
+        beep: fn(dev: &File, freq: i32) -> nix::Result<()>,
     }
-    Ok(())
-}
 
-fn driver_console(dev: &File, freq: i32) -> nix::Result<()> {
-    let period_in_clock_cycles = TIMER_FREQUENCY.checked_div(freq as u32).unwrap_or(0);
-
-    unsafe {
-        kiocsound(dev.as_raw_fd(), period_in_clock_cycles as i32)?;
+    impl Driver {
+        pub fn beep(&self, freq: i32) -> nix::Result<()> {
+            (self.beep)(self.device, freq)
+        }
     }
-    Ok(())
-}
 
-#[cfg(target_os = "linux")]
-fn get_driver(device: &'static File) -> Driver {
-    match unsafe { kiocsound(device.as_raw_fd(), 0) } {
-        Ok(_) => Driver {
+    #[cfg(target_os = "linux")]
+    fn driver_evdev(dev: &File, freq: i32) -> nix::Result<()> {
+        unsafe {
+            let mut e = MaybeUninit::<input_event>::zeroed().assume_init();
+            e.type_ = EV_SND;
+            e.code = SND_TONE;
+            e.value = freq;
+
+            let e_ptr: *mut c_void = &mut e as *mut _ as *mut c_void;
+            write(dev.as_raw_fd(), e_ptr, size_of::<input_event>());
+        }
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    fn driver_console(dev: &File, freq: i32) -> nix::Result<()> {
+        let period_in_clock_cycles = TIMER_FREQUENCY.checked_div(freq as u32).unwrap_or(0);
+        unsafe {
+            kiocsound(dev.as_raw_fd(), period_in_clock_cycles as i32)?;
+        }
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    fn driver_console(_dev: &File, _freq: i32) -> nix::Result<()> {
+        // macOS/BSD: no-op console beep (graceful degradation)
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    fn get_driver(device: &'static File) -> Driver {
+        match unsafe { kiocsound(device.as_raw_fd(), 0) } {
+            Ok(_) => Driver {
+                device,
+                beep: driver_console,
+            },
+            Err(_) => Driver {
+                device,
+                beep: driver_evdev,
+            },
+        }
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    fn get_driver(device: &'static File) -> Driver {
+        Driver {
             device,
             beep: driver_console,
-        },
-        Err(_) => Driver {
-            device,
-            beep: driver_evdev,
-        },
+        }
+    }
+
+    pub fn beep(freq: i32, time: Duration) -> Result<()> {
+        let device = DEVICE.as_ref().ok_or(DeviceError)?;
+        let driver = get_driver(device);
+        driver.beep(freq)?;
+        sleep(time);
+        driver.beep(0)?;
+        Ok(())
     }
 }
 
-#[cfg(not(target_os = "linux"))]
-fn get_driver(device: &'static File) -> Driver {
-    Driver {
-        device,
-        beep: driver_console,
-    }
+// Test implementation overlay - include external test module when feature is enabled
+#[cfg(feature = "test-beep")]
+mod test_overlay {
+    include!("beep_test.rs");
 }
 
-pub fn beep(freq: i32, time: Duration) -> Result<()> {
-    let device = DEVICE.as_ref().ok_or(DeviceError)?;
-    let driver = get_driver(device);
+// Public API - dispatch to appropriate implementation
+#[cfg(not(feature = "test-beep"))]
+pub use hardware::beep;
 
-    driver.beep(freq)?;
-    sleep(time);
-    driver.beep(0)?;
-    Ok(())
-}
+#[cfg(feature = "test-beep")]
+pub use test_overlay::beep;
+
+#[cfg(all(test, feature = "test-beep"))]
+pub use test_overlay::{__beep_log_clear, __beep_log_snapshot};

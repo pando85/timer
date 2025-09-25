@@ -87,6 +87,11 @@ jobs:
         shell: bash
         run: cargo test --verbose
 
+      - name: Run tests (test-beep feature)
+        if: matrix.job.target == 'x86_64-unknown-linux-gnu'
+        shell: bash
+        run: cargo test --features test-beep --verbose
+
       - name: Extract crate information
         shell: bash
         run: |

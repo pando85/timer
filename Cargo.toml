@@ -31,6 +31,10 @@ nix = { version = "0.30", features = ["ioctl"] }
 [dev-dependencies]
 time = { version = "0.3", features = ["macros"] }
 
+[features]
+# Enables in-memory logging of beep frequencies for deterministic tests (no real device access)
+test-beep = []
+
 
 [profile.release]
 codegen-units = 1
