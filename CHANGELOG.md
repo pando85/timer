@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.10.0](https://github.com/pando85/timer/tree/v0.10.0) - 2025-10-31
+
+### Fixed
+
+- Make clippy 1.89 happy ([ecb355b](https://github.com/pando85/timer/commit/ecb355b0eb699314f0acd074bdc372830f6985be))
+
+### Documentation
+
+- Add copilot instructions ([8b2f980](https://github.com/pando85/timer/commit/8b2f98024257d2ead5e69380f473ba7ec7e74c38))
+- Add commit ID links in CHANGELOG.md ([3a4089a](https://github.com/pando85/timer/commit/3a4089a6054900883263fe1d1c5c188db01fd653))
+
+### Build
+
+- ci: Fix cargo login token ([267e44a](https://github.com/pando85/timer/commit/267e44ac1b5287e5c0e617709251bc8ce27f7634))
+- ci: Change Apple build to arm64 and update to macos-15 ([7a1d24f](https://github.com/pando85/timer/commit/7a1d24f95c0d6a78115c84e5a2887a5687458a60))
+  - **BREAKING**: Apple x86_64 binary is deprecated.
+- deps: Update Rust crate rodio to v0.21.1 ([140ac00](https://github.com/pando85/timer/commit/140ac005c0b9ae878a2f4a05904437f3ccad8a06))
+- deps: Update Rust crate clap to v4.5.42 ([ffd3d34](https://github.com/pando85/timer/commit/ffd3d34c3bb3dfeaeada76056e70b3763dea1cd8))
+- deps: Update Rust crate clap to v4.5.43 ([7b77a73](https://github.com/pando85/timer/commit/7b77a7395c0b1edb396ffffcd72d77f57347fc1a))
+- deps: Update Rust crate clap to v4.5.44 ([6c2125b](https://github.com/pando85/timer/commit/6c2125b5686a0a3468e8cd46e9d25d68dac71694))
+- deps: Update actions/checkout action to v5 ([e32c0e9](https://github.com/pando85/timer/commit/e32c0e9e98102cc0a565f729fd63a61ee7440412))
+- deps: Update Rust crate glob to v0.3.3 ([8184a8a](https://github.com/pando85/timer/commit/8184a8a398afe33308a929e43e77f7a24455d4a9))
+- deps: Update Rust crate libc to v0.2.175 ([4fe9427](https://github.com/pando85/timer/commit/4fe9427c5a5990345200422160f9bc0c99da10a9))
+- deps: Update pre-commit hook pre-commit/pre-commit-hooks to v6 ([c6945dc](https://github.com/pando85/timer/commit/c6945dc0a08b92ecb69ccdf1e1d4362846b05b4e))
+- deps: Update Rust crate clap to v4.5.45 ([65c570a](https://github.com/pando85/timer/commit/65c570a62c40235ef23cfe3c25f9a8f4640331c2))
+- deps: Update Rust crate regex to v1.11.2 ([738d03f](https://github.com/pando85/timer/commit/738d03fe8e9c6c9f32ec9fa8609c9a5a859f2a38))
+- deps: Update Rust crate clap to v4.5.46 ([a969efc](https://github.com/pando85/timer/commit/a969efc5893c9dc5a2c76a55f3b4eda5bfd90998))
+- deps: Update Rust crate clap to v4.5.47 ([6636fd6](https://github.com/pando85/timer/commit/6636fd685d3e3b9f6daa694da282c738c004f52d))
+- deps: Update Rust crate time to v0.3.43 ([4dc9a6a](https://github.com/pando85/timer/commit/4dc9a6ae7c577f2c4fc719495c84e9fe7754c15b))
+- deps: Update actions/stale action to v10 ([9f84d36](https://github.com/pando85/timer/commit/9f84d36a9c3a3b78108fb07812ffe606b22509d3))
+- deps: Update clechasseur/rs-clippy-check action to v5 ([c0798b2](https://github.com/pando85/timer/commit/c0798b2babb7f839319408ac637ac3518e9acdfe))
+- deps: Update actions/setup-python action to v6 ([b7cab2f](https://github.com/pando85/timer/commit/b7cab2fcd8e5505dd6378bb37b9918e9a9a472c2))
+- deps: Update Rust crate clap to v4.5.48 ([fa2c44d](https://github.com/pando85/timer/commit/fa2c44d659b0fbc26e473eb66cb89241943e6e64))
+- deps: Update Rust crate libc to v0.2.176 ([a47cb26](https://github.com/pando85/timer/commit/a47cb2666c5fc282a0b21d32fc35dfdc025da0e2))
+- deps: Update Rust crate regex to v1.11.3 ([4c81137](https://github.com/pando85/timer/commit/4c811371425ddf858744ff80b31aae5fd96fb2f4))
+- deps: Update Rust crate time to v0.3.44 ([96a2104](https://github.com/pando85/timer/commit/96a21044a418403ee4b71484c5c2fa850ffd3891))
+- deps: Update pre-commit hook alessandrojcm/commitlint-pre-commit-hook to v9.23.0 ([7fee635](https://github.com/pando85/timer/commit/7fee635cbd7b1a177758caa60a6e5c9d4da7668f))
+- deps: Update Rust crate regex to v1.12.1 ([fd0c7e2](https://github.com/pando85/timer/commit/fd0c7e216b6d90906a21a634ee53b5d2dd33c881))
+- deps: Update Rust crate regex to v1.12.2 ([7883edc](https://github.com/pando85/timer/commit/7883edc465f134ade613d04fae90c8078e0418f2))
+- deps: Update Rust crate libc to v0.2.177 ([945cadd](https://github.com/pando85/timer/commit/945cadd09aca7db9bbd552b5d59e5338d6cccd66))
+- deps: Update Rust crate clap to v4.5.49 ([974ce25](https://github.com/pando85/timer/commit/974ce250fb175cd76f6591bb9ef5e0aadc8c0445))
+- deps: Update Rust crate clap to v4.5.50 ([ce43cde](https://github.com/pando85/timer/commit/ce43cde10b1c36b08077b3080fc90f69af0ddaad))
+- deps: Update Rust crate clap to v4.5.51 ([d05b0b5](https://github.com/pando85/timer/commit/d05b0b5208fbc0995cfd28ad71d510a8bee2ce5d))
+
 ## [v0.9.0](https://github.com/pando85/timer/tree/v0.9.0) - 2025-07-13
 
 ### Added
