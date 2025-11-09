@@ -11,7 +11,7 @@
   <img src="https://raw.githubusercontent.com/pando85/timer/master/assets/demo.gif" alt="demo">
 </p>
 
-![Build status](https://img.shields.io/github/actions/workflow/status/pando85/timer/rust.yml?branch=main)
+![Build status](https://img.shields.io/github/actions/workflow/status/pando85/timer/rust.yml?branch=master)
 ![Timer license](https://img.shields.io/github/license/pando85/timer)
 
 Simple count down terminal alarm.
@@ -72,8 +72,8 @@ sudo mv timer /usr/local/bin
 
 ## Beep
 
-If you want to enable beep from your built-in case speaker you will need to run one of these
-kernel modules: `pcspkr` (recommended) or `snd-pcsp`.
+If you want to enable beep from your built-in case speaker you will need to run one of these kernel
+modules: `pcspkr` (recommended) or `snd-pcsp`.
 
 In addition, to use beep as normal user read the [`PERMISSIONS.md`](PERMISSIONS.md) file.
 
