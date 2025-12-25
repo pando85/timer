@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.0](https://github.com/pando85/timer/tree/v0.11.0) - 2025-12-25
+
+### Added
+
+- Add stopwatch function ([9f7eb34](https://github.com/pando85/timer/commit/9f7eb34ae7bf727e50878980b6abb8d0fd327b93))
+
+### Fixed
+
+- Ensure CHANGELOG commit IDs are correct on release process ([f22bb4b](https://github.com/pando85/timer/commit/f22bb4bd257bae1c3e7028bcab0d8383b73b6c62))
+
+### Documentation
+
+- Fix build status link ([703df54](https://github.com/pando85/timer/commit/703df54a65baf31ddde494d961184ef11c0f95a9))
+- Add white background to the logo ([cbd895b](https://github.com/pando85/timer/commit/cbd895ba017fefa19fc35ae411473564b8bf4bf0))
+
+### Build
+
+- deps: Update Rust crate clap to v4.5.52 ([96a85ab](https://github.com/pando85/timer/commit/96a85ab77c4e0471c29e2189bf185039eda59210))
+- deps: Update Rust crate clap to v4.5.53 ([c7b3d3b](https://github.com/pando85/timer/commit/c7b3d3bda108690c022cc999c2c23161f95bb62f))
+- deps: Update actions/checkout action to v6 ([6552868](https://github.com/pando85/timer/commit/65528683206b960c5ba24ba61652624e05ee9871))
+- deps: Update actions/cache action to v5 ([a11a1dc](https://github.com/pando85/timer/commit/a11a1dcd7d33050eb0f1071941501e122170f395))
+- deps: Update Rust crate libc to v0.2.178 ([aa3a393](https://github.com/pando85/timer/commit/aa3a3933133e13ed1ffc661e2c6f86875daa2247))
+
 ## [v0.10.0](https://github.com/pando85/timer/tree/v0.10.0) - 2025-10-31
 
 ### Fixed
