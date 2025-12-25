@@ -3,6 +3,7 @@ mod constants;
 mod figlet;
 mod opts;
 mod sound;
+mod stopwatch;
 mod time;
 mod timer;
 mod ui;
@@ -11,7 +12,7 @@ mod utils;
 extern crate time as time_crate;
 
 use crate::beep::beep;
-use crate::opts::Opts;
+use crate::opts::{Command, Opts};
 
 use std::io;
 use std::process::exit;
@@ -49,6 +50,33 @@ fn handle_countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) {
 fn main() {
     let opts: Opts = Opts::parse();
 
+    // Handle stopwatch subcommand
+    if let Some(Command::Stopwatch) = opts.command {
+        run_stopwatch();
+        return;
+    }
+
+    // Handle countdown (default behavior)
+    run_countdown(opts);
+}
+
+fn run_stopwatch() {
+    let mut stdout = io::stdout();
+    ui::set_up_terminal(&mut stdout).unwrap();
+
+    match stopwatch::run(&mut stdout) {
+        Ok(_) => {
+            ui::restore_terminal(&mut stdout).unwrap();
+        }
+        Err(e) => {
+            ui::restore_terminal(&mut stdout).unwrap();
+            eprintln!("Error: {e:?}");
+            exit(1);
+        }
+    }
+}
+
+fn run_countdown(opts: Opts) {
     let input_time = opts.time.join(" ");
     let end = match parse_time(input_time.as_str()) {
         Some(x) => x,
