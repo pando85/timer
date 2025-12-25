@@ -1,4 +1,4 @@
-use clap::{ArgAction, Parser, crate_authors, crate_description, crate_version};
+use clap::{ArgAction, Parser, Subcommand, crate_authors, crate_description, crate_version};
 
 #[derive(Parser)]
 #[command(
@@ -8,6 +8,9 @@ use clap::{ArgAction, Parser, crate_authors, crate_description, crate_version};
     author = crate_authors!("\n"),
 )]
 pub struct Opts {
+    #[command(subcommand)]
+    pub command: Option<Command>,
+
     /// Repeat countdown infinitely
     #[arg(short, long)]
     pub r#loop: bool,
@@ -22,6 +25,12 @@ pub struct Opts {
     /// In addition, you can set a target time `%H:%M`. E.g.: 10s, 08:25, 12:00, 3h10m, 15min, 10.
     #[arg(action = ArgAction::Append, num_args = 1)]
     pub time: Vec<String>,
+}
+
+#[derive(Subcommand)]
+pub enum Command {
+    /// Start a stopwatch (counts up from zero)
+    Stopwatch,
 }
 
 #[test]
