@@ -21,7 +21,7 @@ crossterm = "0.29"
 glob = "0.3"
 regex = "1.10"
 rodio = { version = "0.21", features = ["vorbis"] }
-signal-hook = "0.3"
+signal-hook = "0.4"
 tailcall = "1.0"
 time = { version = "0.3", features = ["formatting", "local-offset", "parsing"] }
 # beep
