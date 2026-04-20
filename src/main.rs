@@ -7,7 +7,6 @@ mod stopwatch;
 mod time;
 mod timer;
 mod ui;
-mod utils;
 
 extern crate time as time_crate;
 

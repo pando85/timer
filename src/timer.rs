@@ -1,19 +1,16 @@
 use crate::Result;
 use crate::beep::beep;
-use crate::constants::{
-    BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, PLAY_TIMEOUT, SOUND_START_DELAY,
-};
+use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, SOUND_START_DELAY};
 use crate::opts::Opts;
 use crate::sound::Sound;
 use crate::ui;
-use crate::utils::spawn_thread;
 
 use std::io;
 use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
-use tailcall::{tailcall, call};
+use tailcall::tailcall;
 use time::{Duration, OffsetDateTime, Time, format_description};
 
 pub const BELL_CHART: char = '';
@@ -107,57 +104,51 @@ where
     }
 }
 
-fn play_beep() -> Result<()> {
-    for _ in 0..BEEP_REPETITIONS {
-        // order in the delay is because sounds start beeping ~100ms later than beep
-        sleep(stdDuration::from_millis(SOUND_START_DELAY));
-        // ignore beep device is not writeable
-        if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
-            sleep(stdDuration::from_millis(BEEP_DURATION));
-        }
-
-        // let this indicated for possible changes in constant values
-        #[allow(clippy::absurd_extreme_comparisons)]
-        if BEEP_DELAY - SOUND_START_DELAY > 0 {
-            sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
-        }
-    }
-    Ok(())
-}
-
-fn play_sound() -> Result<()> {
-    let sound = Sound::new()?;
-
-    for _ in 0..BEEP_REPETITIONS {
-        sound.play()?;
-        sleep(stdDuration::from_millis(BEEP_DELAY));
-    }
-    Ok(())
-}
-
 #[tailcall]
 pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()> {
     match end - OffsetDateTime::now_utc() {
-        counter if counter > Duration::ZERO => {
-            ui::draw(w, counter)?;
-            sleep(stdDuration::from_secs(1));
-            call! { countdown(w, end, opts) }
-        }
-        counter if counter <= Duration::ZERO => {
-            ui::draw(w, Duration::ZERO)?;
-            if opts.terminal_bell {
-                println!("{BELL_CHART}");
+        counter if counter > Duration::ZERO => match ui::draw(w, counter) {
+            Ok(_) => {
+                sleep(stdDuration::from_secs(1));
+                countdown(w, end, opts)
             }
+            Err(e) => Err(e),
+        },
+        counter if counter <= Duration::ZERO => match ui::draw(w, Duration::ZERO) {
+            Ok(_) => {
+                if opts.terminal_bell {
+                    println!("{BELL_CHART}");
+                }
 
-            let mut result = Ok(());
-            if !opts.silence {
-                // error cannot be printed because we restore the terminal after this
-                let handler_with_timeout = spawn_thread(|| play_sound().unwrap());
-                play_beep()?;
-                result = handler_with_timeout.join(stdDuration::from_millis(PLAY_TIMEOUT))
+                let mut result = Ok(());
+                if !opts.silence {
+                    match Sound::new() {
+                        Ok(sound) => {
+                            for _ in 0..BEEP_REPETITIONS {
+                                sleep(stdDuration::from_millis(SOUND_START_DELAY));
+                                if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err()
+                                {
+                                    sleep(stdDuration::from_millis(BEEP_DURATION));
+                                }
+
+                                #[allow(clippy::absurd_extreme_comparisons)]
+                                if BEEP_DELAY - SOUND_START_DELAY > 0 {
+                                    sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
+                                }
+
+                                if sound.play().is_err() {
+                                    break;
+                                }
+                                sleep(stdDuration::from_millis(BEEP_DELAY));
+                            }
+                        }
+                        Err(e) => result = Err(e),
+                    }
+                }
+                result
             }
-            result
-        }
+            Err(e) => Err(e),
+        },
         _ => unreachable!(),
     }
 }
