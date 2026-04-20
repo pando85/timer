@@ -13,7 +13,7 @@ use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
-use tailcall::tailcall;
+use tailcall::{call, tailcall};
 use time::{Duration, OffsetDateTime, Time, format_description};
 
 pub const BELL_CHART: char = '';
@@ -141,7 +141,7 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
         counter if counter > Duration::ZERO => {
             ui::draw(w, counter)?;
             sleep(stdDuration::from_secs(1));
-            countdown(w, end, opts)
+            call! { countdown(w, end, opts) }
         }
         counter if counter <= Duration::ZERO => {
             ui::draw(w, Duration::ZERO)?;
