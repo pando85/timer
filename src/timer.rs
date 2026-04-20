@@ -105,7 +105,10 @@ where
 }
 
 #[tailcall]
-pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()> {
+pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
+where
+    W: io::Write,
+{
     match end - OffsetDateTime::now_utc() {
         counter if counter > Duration::ZERO => match ui::draw(w, counter) {
             Ok(_) => {
@@ -114,7 +117,7 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
             }
             Err(e) => Err(e),
         },
-        counter if counter <= Duration::ZERO => match ui::draw(w, Duration::ZERO) {
+        _ => match ui::draw(w, Duration::ZERO) {
             Ok(_) => {
                 if opts.terminal_bell {
                     println!("{BELL_CHART}");
@@ -149,7 +152,6 @@ pub fn countdown<W: io::Write>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> R
             }
             Err(e) => Err(e),
         },
-        _ => unreachable!(),
     }
 }
 
