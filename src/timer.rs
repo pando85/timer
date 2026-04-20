@@ -13,7 +13,7 @@ use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
-use tailcall::{call, tailcall};
+use tailcall::{tailcall, call};
 use time::{Duration, OffsetDateTime, Time, format_description};
 
 pub const BELL_CHART: char = '';
