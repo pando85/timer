@@ -1358,18 +1358,18 @@ dependencies = [
 
 [[package]]
 name = "tailcall"
-version = "2.0.4"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a704124bd07b1c2c42260117324a7e89a67caf5ef6d7d4cceed0659a69319b8b"
+checksum = "7cc49b469158d8907affe62ace08a1a627633cc8a27205b358d856cb89c90e02"
 dependencies = [
  "tailcall-impl",
 ]
 
 [[package]]
 name = "tailcall-impl"
-version = "2.0.4"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25f66cd3a12ea582dc8b31aa7c37e7875282cae3e64176568d6525eda2620600"
+checksum = "bab0f163dbdc0f26244a178a23c8c6b5d0df8f102c0545372a9750142366b89c"
 dependencies = [
  "proc-macro2",
  "quote",
