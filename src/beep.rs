@@ -31,7 +31,7 @@ fn get_device() -> Option<File> {
             .ok()
             .into_iter()
             .flatten()
-            .filter_map(|p| p.to_str().map(|s| s.to_string()))
+            .filter_map(|p| p.ok().and_then(|pb| pb.to_str().map(|s| s.to_string())))
     };
     let all_ttys = paths_from_glob("/dev/tty[0-9]*");
     let all_vcs = paths_from_glob("/dev/vc/[0-9]*");
