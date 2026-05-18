@@ -26,14 +26,15 @@ const TIMER_FREQUENCY: u32 = 1193182;
 static DEVICE: LazyLock<Option<File>> = LazyLock::new(get_device);
 
 fn get_device() -> Option<File> {
-    let strings_from_glob = |x| {
-        glob(x)
-            .unwrap()
-            .map(|x| x.unwrap().to_str().unwrap().to_string())
-            .collect::<Vec<String>>()
+    let paths_from_glob = |pattern: &str| {
+        glob(pattern)
+            .ok()
+            .into_iter()
+            .flatten()
+            .filter_map(|p| p.to_str().map(|s| s.to_string()))
     };
-    let all_ttys = strings_from_glob("/dev/tty[0-9]*");
-    let all_vcs = strings_from_glob("/dev/vc/[0-9]*");
+    let all_ttys = paths_from_glob("/dev/tty[0-9]*");
+    let all_vcs = paths_from_glob("/dev/vc/[0-9]*");
     DEVICE_PATHS
         .into_iter()
         .map(|s| s.to_string())
