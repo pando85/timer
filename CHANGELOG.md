@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.1](https://github.com/pando85/timer/tree/v0.11.1) - 2026-05-18
+
+### Fixed
+
+- ci: Handle shallow clones in release script ([4488932](https://github.com/pando85/timer/commit/4488932bd9d761a3e7ac06a80f8e6b42404a2a8e))
+
 ## [v0.11.0](https://github.com/pando85/timer/tree/v0.11.0) - 2025-12-25
 
 ### Added
