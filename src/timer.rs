@@ -134,11 +134,6 @@ where
                                     sleep(stdDuration::from_millis(BEEP_DURATION));
                                 }
 
-                                #[allow(clippy::absurd_extreme_comparisons)]
-                                if BEEP_DELAY - SOUND_START_DELAY > 0 {
-                                    sleep(stdDuration::from_millis(BEEP_DELAY - SOUND_START_DELAY));
-                                }
-
                                 if sound.play().is_err() {
                                     break;
                                 }
