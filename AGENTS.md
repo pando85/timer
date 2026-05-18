@@ -235,3 +235,52 @@ When adding new features:
 - **UI changes:** Modify `ui.rs` and `time.rs` rendering
 - **New alerts:** Add to `beep.rs` or `sound/mod.rs`
 - **Subcommands:** Consider using clap subcommands in `opts.rs`
+
+## Release Workflow
+
+When running a release (`/release` command), follow these mandatory steps:
+
+### 1. Unshallow Git Repository (CRITICAL)
+
+**MUST be done before running git-cliff.** Without full git history, git-cliff will produce incomplete changelog.
+
+```bash
+# Check if repository is shallow
+git rev-parse --is-shallow-repository
+
+# If "true", unshallow immediately
+git fetch --unshallow --quiet
+git fetch --tags --quiet
+```
+
+### 2. Version Bump
+
+Edit `Cargo.toml` to bump the version number (patch/minor/major as appropriate).
+
+### 3. Update Lock File
+
+```bash
+cargo update -p timer-cli
+```
+
+### 4. Update CHANGELOG
+
+```bash
+make update-changelog
+```
+
+This runs `git cliff -t v<VERSION> -u -p CHANGELOG.md`.
+
+### 5. Commit and Create PR
+
+```bash
+git add .
+git commit -m "release: Version <VERSION>"
+git checkout -b release/v<VERSION>
+git push origin release/v<VERSION>
+git-api pr create --title "release: Version <VERSION>" --body "..."
+```
+
+### Note on Protected Branches
+
+The `master` branch is protected. Releases must go through a PR. After merge, tagging and GitHub release are automated.
