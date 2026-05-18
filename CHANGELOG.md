@@ -7,9 +7,69 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [v0.11.1](https://github.com/pando85/timer/tree/v0.11.1) - 2026-05-18
 
+### Added
+
+- Add git cliff support for github squash commits ([1fcca27](https://github.com/pando85/timer/commit/1fcca27a2c27e617ff7ef6ab17cb8c24d9b3a8c9))
+
 ### Fixed
 
 - ci: Handle shallow clones in release script ([4488932](https://github.com/pando85/timer/commit/4488932bd9d761a3e7ac06a80f8e6b42404a2a8e))
+- deps: Update Cargo.lock for signal-hook 0.4.1 ([aabe8ce](https://github.com/pando85/timer/commit/aabe8cecbcb92e7c5fb8ab4d1867fd22de5301b8))
+- Update rodio API for v0.22 compatibility ([435f916](https://github.com/pando85/timer/commit/435f9161c35146f8207661af43b385dd0edc271a))
+- Update tailcall syntax for v2.0 API ([8361eb5](https://github.com/pando85/timer/commit/8361eb5c515280bef40b481490f1afb2d5e70b86))
+- Use tailcall v2.0.1 (v2.0.0 was yanked) ([571d23b](https://github.com/pando85/timer/commit/571d23bf04d2ec8441b21c1b88bbe191c9b538ca))
+- Update code for tailcall v2 compatibility ([3dc2c86](https://github.com/pando85/timer/commit/3dc2c864e3532d0587adbe2e4ac0ccb9b1e1ae83))
+- Resolve clippy warnings for tailcall v2 ([e257ef3](https://github.com/pando85/timer/commit/e257ef35f40f600ea602b9bd2671c0b84bb8cc60))
+- Improve reliability and remove dead code ([78dbfa3](https://github.com/pando85/timer/commit/78dbfa34d7a21d3f312a401489b956f25a246e38))
+
+### Build
+
+- ci: Automerge patch requests ([97ebfa5](https://github.com/pando85/timer/commit/97ebfa5c9f81686788c94ef720762ea527dc08f5))
+- ci: Automerge minor requests ([a7e5fec](https://github.com/pando85/timer/commit/a7e5fec91b74c775b802c1ae0cddf98abd5b4ee9))
+- deps: Update Rust crate signal-hook to 0.4 ([418baac](https://github.com/pando85/timer/commit/418baac0924106de5811415fa60b1c99202aa7ea))
+- deps: Update Rust crate clap to v4.5.54 ([f98e745](https://github.com/pando85/timer/commit/f98e7458a8388398ccdd0dd9de51adb6dcdcfae0))
+- deps: Update Rust crate libc to v0.2.180 ([29ee705](https://github.com/pando85/timer/commit/29ee705444e51d113a1edd50c92d046174c555b6))
+- deps: Update Rust crate time to v0.3.45 ([9ced5c6](https://github.com/pando85/timer/commit/9ced5c62aa013608c239ba81e2f1b63fbbcfbbdb))
+- deps: Update pre-commit hook adrienverge/yamllint to v1.38.0 ([2b33000](https://github.com/pando85/timer/commit/2b330004c2a1a75130d93e672d1f9c0ebae0e0f6))
+- deps: Update pre-commit hook alessandrojcm/commitlint-pre-commit-hook to v9.24.0 ([206dee3](https://github.com/pando85/timer/commit/206dee34f0ca189695a0e64ae77d3624bafdbdbc))
+- deps: Update Rust crate nix to 0.31 ([83c9f10](https://github.com/pando85/timer/commit/83c9f1076efee7e5f5dd3c26838cb787f20ceca0))
+- deps: Update Rust crate time to v0.3.46 ([d84b612](https://github.com/pando85/timer/commit/d84b612463f7240fd680eb54de23f0a785be1a66))
+- deps: Update Rust crate signal-hook to v0.4.2 ([46fa41f](https://github.com/pando85/timer/commit/46fa41fce77cc9cb8e163ee4a4953451e27ae35d))
+- deps: Update Rust crate signal-hook to v0.4.3 ([1c690cd](https://github.com/pando85/timer/commit/1c690cd48e3b49cb2336efe8d9a5b58c84092fc4))
+- deps: Update Rust crate clap to v4.5.55 ([a5d271f](https://github.com/pando85/timer/commit/a5d271f7e5ae2eaec61d034503218ce4699e9cd4))
+- deps: Update Rust crate clap to v4.5.56 ([47888d1](https://github.com/pando85/timer/commit/47888d1f27ba2a8a747065aa2c4c889dd3ee4220))
+- deps: Update Rust crate clap to v4.5.57 ([b2c95d7](https://github.com/pando85/timer/commit/b2c95d7e6dc9ef3da350feea758b8472966bbd17))
+- deps: Update Rust crate regex to v1.12.3 ([d830629](https://github.com/pando85/timer/commit/d830629e5bad8d02ca5123ef581a36af7009eab0))
+- deps: Bump bytes from 1.10.1 to 1.11.1 ([66b816c](https://github.com/pando85/timer/commit/66b816c56e6ba591b676675493a9b3649774064c))
+- deps: Update Rust crate time to v0.3.47 ([107d9dd](https://github.com/pando85/timer/commit/107d9ddbb7e0f6ea9a44aa2e970b18851892c6c6))
+- deps: Update Rust crate clap to v4.5.58 ([3738912](https://github.com/pando85/timer/commit/37389121cf2957074654316cda6845cfda504b0a))
+- deps: Update Rust crate clap to v4.5.59 ([b414f80](https://github.com/pando85/timer/commit/b414f806a360d86907d6489043c95f911c0b3da1))
+- deps: Update Rust crate clap to v4.5.60 ([bbffa9a](https://github.com/pando85/timer/commit/bbffa9a02083b1833989e8a29dd6eadeadd7d402))
+- deps: Update Rust crate nix to v0.31.2 ([147a52a](https://github.com/pando85/timer/commit/147a52a59f76c7c1eb902f577d2554e0eacca1ad))
+- deps: Update Rust crate rodio to 0.22 ([acef723](https://github.com/pando85/timer/commit/acef723082c3a9fa46a2cf5af02deae8f19d36ec))
+- deps: Update Rust crate rodio to v0.22.2 ([ed51ca5](https://github.com/pando85/timer/commit/ed51ca54ac75f95e2fbb09f0685273e18cb629f8))
+- deps: Update Rust crate libc to v0.2.183 ([ca1a6d0](https://github.com/pando85/timer/commit/ca1a6d051b7a291076b8de476b8c4061ce1adffe))
+- deps: Update Rust crate clap to v4.6.0 ([fa9c8a3](https://github.com/pando85/timer/commit/fa9c8a37e3bb02d8ec186262478daa583cacd05f))
+- deps: Update Rust crate libc to v0.2.184 ([101a43a](https://github.com/pando85/timer/commit/101a43a0bd246417e6e278d3a2ae7a02c2d85b1e))
+- deps: Update KSXGitHub/github-actions-deploy-aur action to v4.1.2 ([f7f57a3](https://github.com/pando85/timer/commit/f7f57a362a51d08c355ea509a59b329078de6b40))
+- deps: Update Rust crate signal-hook to v0.4.4 ([b7bee8e](https://github.com/pando85/timer/commit/b7bee8ea945b8cba0244b4b1362ec8f15fd28d6d))
+- deps: Update Rust crate libc to v0.2.185 ([93de506](https://github.com/pando85/timer/commit/93de506dd81b0759e2d934caf1fffefde057b40e))
+- deps: Update Rust crate clap to v4.6.1 ([e4436fe](https://github.com/pando85/timer/commit/e4436fefbff5c794d91f106067b24edf073d171d))
+- deps: Update KSXGitHub/github-actions-deploy-aur action to v4.1.3 ([239b5fb](https://github.com/pando85/timer/commit/239b5fbcf2af8a9b93b44efe4204c576d44b3702))
+- deps: Update Rust crate tailcall to v2 ([2e54c28](https://github.com/pando85/timer/commit/2e54c28e191901aa3545fdc49a819cdcc40a9728))
+- deps: Update Rust crate tailcall to v2.0.4 ([e983c4e](https://github.com/pando85/timer/commit/e983c4e256730dd1f07d71772de4f4818cf44410))
+- deps: Update Rust crate tailcall to v2.1.0 ([8441c6c](https://github.com/pando85/timer/commit/8441c6cdaa51fdd0bf1e90f9f400254f354abbbc))
+- deps: Update Rust crate tailcall to v2.2.0 ([93209cf](https://github.com/pando85/timer/commit/93209cf20a390245286e000de4f7df807141b810))
+- deps: Update softprops/action-gh-release action to v3 ([25ad187](https://github.com/pando85/timer/commit/25ad187f4f78d9f9c0a5fb6d60b14278cbbeb2ec))
+- deps: Update clechasseur/rs-clippy-check action to v6 ([1ab3ffd](https://github.com/pando85/timer/commit/1ab3ffdfe7f6597822e41121ac6e959f654abee3))
+- deps: Update Rust crate tailcall to v2.2.1 ([1c36893](https://github.com/pando85/timer/commit/1c36893048fcd4407efeea8b1d6605ae94663d5b))
+- deps: Update Rust crate tailcall to v2.2.2 ([68dbecc](https://github.com/pando85/timer/commit/68dbecc860172a717c37456bddc78a8f0dc20c80))
+- deps: Update Rust crate tailcall to v2.3.0 ([8f8da59](https://github.com/pando85/timer/commit/8f8da59debff69a4efd11621bbdee796dbc06c46))
+- deps: Update Rust crate libc to v0.2.186 ([a7c84f9](https://github.com/pando85/timer/commit/a7c84f922ca8ce8c91c703f57fafa265cb853e92))
+- deps: Update clechasseur/rs-clippy-check action to v6.0.3 ([4d728a6](https://github.com/pando85/timer/commit/4d728a64e70461e580bfc5116890c657afc3f3d4))
+- deps: Update pre-commit hook alessandrojcm/commitlint-pre-commit-hook to v9.25.0 ([19c5542](https://github.com/pando85/timer/commit/19c5542c0cf07b287fde97d0331154be749d024c))
+- deps: Update clechasseur/rs-clippy-check action to v6.0.4 ([191e6a5](https://github.com/pando85/timer/commit/191e6a5b67ce522a819a29ba45ba3eb8031f13dc))
+- deps: Update Rust crate nix to v0.31.3 ([696aeab](https://github.com/pando85/timer/commit/696aeabe7086026af0eae71504ad3c2c467c87bd))
 
 ## [v0.11.0](https://github.com/pando85/timer/tree/v0.11.0) - 2025-12-25
 
