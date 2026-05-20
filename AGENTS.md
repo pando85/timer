@@ -281,6 +281,11 @@ git push origin release/v<VERSION>
 git-api pr create --title "release: Version <VERSION>" --body "..."
 ```
 
+## Git Rules
+
+- **NEVER `--amend` unless you verify HEAD is your commit first** — always run `git log --oneline -1` before amending to confirm you're amending the right commit.
+- **When a commit fails (hooks modified files), just commit again normally** — do NOT use `--amend`, or you'll amend the parent commit. Simply stage the changes and `git commit -m "..."` again.
+
 ### Note on Protected Branches
 
 The `master` branch is protected. Releases must go through a PR. After merge, tagging and GitHub release are automated.
