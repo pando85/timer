@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.4](https://github.com/pando85/timer/tree/v0.11.4) - 2026-05-20
+
+### Fixed
+
+- Trim trailing whitespace in snapshot tests ([b61c390](https://github.com/pando85/timer/commit/b61c39016ca75f924b3286d52e301b5ff214391e))
+- Test completion alerts without tty dependency ([665cb7e](https://github.com/pando85/timer/commit/665cb7ee56c0e9a4ecff8c51dfbcb07788fa7c18))
+
+### Documentation
+
+- Replace completed test plan with hardware layer plan ([c7e425f](https://github.com/pando85/timer/commit/c7e425f700e7feec26b2de0f90a5fab51bdb70c2))
+
+### Refactor
+
+- Extract alert trait for testable countdown alerts ([bc4240d](https://github.com/pando85/timer/commit/bc4240d3fa5dd781e7989223736814a633b40b8f))
+
+### Testing
+
+- Add dev-dependencies for testing plan (assert_cmd, insta, predicates) ([ff50d65](https://github.com/pando85/timer/commit/ff50d6560c59be91e3eae4a5a999933e9d9e95e6))
+- Add unit tests for pure functions ([a6e775b](https://github.com/pando85/timer/commit/a6e775b71184b2e8a2ea94e153cece49a7b30ce4))
+- Add snapshot, cli parsing and integration tests ([912b0ef](https://github.com/pando85/timer/commit/912b0ef5fc6ec7d93baafb91701ee4874c7e480e))
+- Add alert orchestration, resize, parse_time, and regression tests ([caca934](https://github.com/pando85/timer/commit/caca934bcd7733d7057183c356bd43b84017bdd5))
+
 ## [v0.11.3](https://github.com/pando85/timer/tree/v0.11.3) - 2026-05-20
 
 ### Fixed
