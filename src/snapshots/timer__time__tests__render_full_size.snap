@@ -1,6 +1,6 @@
 ---
 source: src/time.rs
-expression: "&result"
+expression: "&trimmed"
 ---
 
 

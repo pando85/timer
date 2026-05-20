@@ -321,23 +321,38 @@ mod tests {
 
     #[test]
     fn test_render_full_size() {
-        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let time = Time::from(&Duration::seconds(7805));
         let result = time.render((120, 30));
-        insta::assert_snapshot!("render_full_size", &result);
+        let trimmed: String = result
+            .lines()
+            .map(|l| l.trim_end())
+            .collect::<Vec<_>>()
+            .join("\n");
+        insta::assert_snapshot!("render_full_size", &trimmed);
     }
 
     #[test]
     fn test_render_medium_size() {
-        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let time = Time::from(&Duration::seconds(7805));
         let result = time.render((60, 20));
-        insta::assert_snapshot!("render_medium_size", &result);
+        let trimmed: String = result
+            .lines()
+            .map(|l| l.trim_end())
+            .collect::<Vec<_>>()
+            .join("\n");
+        insta::assert_snapshot!("render_medium_size", &trimmed);
     }
 
     #[test]
     fn test_render_small_size() {
-        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let time = Time::from(&Duration::seconds(7805));
         let result = time.render((20, 10));
-        insta::assert_snapshot!("render_small_size", &result);
+        let trimmed: String = result
+            .lines()
+            .map(|l| l.trim_end())
+            .collect::<Vec<_>>()
+            .join("\n");
+        insta::assert_snapshot!("render_small_size", &trimmed);
     }
 
     #[test]

@@ -1,5 +1,5 @@
 ---
 source: src/time.rs
-expression: "&result"
+expression: "&trimmed"
 ---
 2h 10m 5s
