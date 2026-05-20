@@ -126,3 +126,43 @@ fn run_countdown(opts: Opts) {
 
     thread_join_handle.join().unwrap();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_time_duration_input() {
+        let result = parse_time("5m");
+        assert!(result.is_some());
+        let parsed_time = result.unwrap();
+        let now = OffsetDateTime::now_utc();
+        let expected_min = now + Duration::from_secs(4 * 60 + 30); // 4m30s from now
+        let expected_max = now + Duration::from_secs(5 * 60); // 5m from now
+
+        // Check that the parsed time is roughly 5 minutes from now
+        assert!(parsed_time >= expected_min && parsed_time <= expected_max);
+    }
+
+    #[test]
+    fn test_parse_time_target_time() {
+        let result = parse_time("23:59");
+        assert!(result.is_some());
+        let parsed_time = result.unwrap();
+        // Check that the hour is 23 and minute is 59
+        assert_eq!(parsed_time.hour(), 23);
+        assert_eq!(parsed_time.minute(), 59);
+    }
+
+    #[test]
+    fn test_parse_time_invalid() {
+        let result = parse_time("invalid");
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_parse_time_empty() {
+        let result = parse_time("");
+        assert!(result.is_none());
+    }
+}
