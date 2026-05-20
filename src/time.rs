@@ -318,4 +318,32 @@ mod tests {
         assert_eq!(time_seconds_only.format_ruled(false, false), "45s"); // seconds-only
         assert_eq!(time_seconds_only.format_ruled(true, true), "45s"); // seconds-only with omit flags
     }
+
+    #[test]
+    fn test_render_full_size() {
+        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let result = time.render((120, 30));
+        insta::assert_snapshot!("render_full_size", &result);
+    }
+
+    #[test]
+    fn test_render_medium_size() {
+        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let result = time.render((60, 20));
+        insta::assert_snapshot!("render_medium_size", &result);
+    }
+
+    #[test]
+    fn test_render_small_size() {
+        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let result = time.render((20, 10));
+        insta::assert_snapshot!("render_small_size", &result);
+    }
+
+    #[test]
+    fn test_try_render_too_small() {
+        let time = Time::from(&Duration::seconds(7805)); // 2h 10m 5s
+        let result = time.try_render((5, 3), false, false, true);
+        assert_eq!(result, None);
+    }
 }

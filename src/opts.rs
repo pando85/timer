@@ -27,7 +27,7 @@ pub struct Opts {
     pub time: Vec<String>,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, PartialEq, Debug)]
 pub enum Command {
     /// Start a stopwatch (counts up from zero)
     Stopwatch,
@@ -37,4 +37,56 @@ pub enum Command {
 fn verify_cli() {
     use clap::CommandFactory;
     Opts::command().debug_assert()
+}
+
+#[test]
+fn test_opts_valid_duration() {
+    let args = ["timer", "5m"];
+    let opts = Opts::try_parse_from(args).unwrap();
+    assert_eq!(opts.time, vec!["5m"]);
+}
+
+#[test]
+fn test_opts_valid_hms() {
+    let args = ["timer", "1h30m45s"];
+    let opts = Opts::try_parse_from(args).unwrap();
+    assert_eq!(opts.time, vec!["1h30m45s"]);
+}
+
+#[test]
+fn test_opts_stopwatch() {
+    let args = ["timer", "stopwatch"];
+    let opts = Opts::try_parse_from(args).unwrap();
+    assert_eq!(opts.command, Some(Command::Stopwatch));
+}
+
+#[test]
+fn test_opts_silence_flag() {
+    let args = ["timer", "--silence", "10s"];
+    let opts = Opts::try_parse_from(args).unwrap();
+    assert!(opts.silence);
+}
+
+#[test]
+fn test_opts_short_flags() {
+    let args = ["timer", "-l", "-s", "5m"];
+    let opts = Opts::try_parse_from(args).unwrap();
+    assert!(opts.r#loop);
+    assert!(opts.silence);
+}
+
+#[test]
+fn test_opts_invalid_flag() {
+    let args = ["timer", "--invalid"];
+    let result = Opts::try_parse_from(args);
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_opts_defaults() {
+    let args = ["timer", "10s"];
+    let opts = Opts::try_parse_from(args).unwrap();
+    assert!(!opts.silence);
+    assert!(!opts.r#loop);
+    assert!(!opts.terminal_bell);
 }
