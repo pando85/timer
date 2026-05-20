@@ -230,4 +230,92 @@ mod tests {
         );
         assert_eq!(get_distance_from_top_left((100, 100), (2000, 2000)), None);
     }
+
+    #[test]
+    fn test_format() {
+        // Test cases for Time::format()
+        assert_eq!(
+            Time {
+                hours: 0,
+                minutes: 0,
+                seconds: 0
+            }
+            .format(),
+            "0s"
+        );
+        assert_eq!(
+            Time {
+                hours: 1,
+                minutes: 0,
+                seconds: 0
+            }
+            .format(),
+            "1h 0m 0s"
+        );
+        assert_eq!(
+            Time {
+                hours: 0,
+                minutes: 30,
+                seconds: 0
+            }
+            .format(),
+            "30m 0s"
+        );
+        assert_eq!(
+            Time {
+                hours: 0,
+                minutes: 0,
+                seconds: 45
+            }
+            .format(),
+            "45s"
+        );
+        assert_eq!(
+            Time {
+                hours: 2,
+                minutes: 10,
+                seconds: 5
+            }
+            .format(),
+            "2h 10m 5s"
+        );
+        assert_eq!(
+            Time {
+                hours: 99,
+                minutes: 59,
+                seconds: 59
+            }
+            .format(),
+            "99h 59m 59s"
+        );
+    }
+
+    #[test]
+    fn test_format_ruled() {
+        // Test cases for Time::format_ruled()
+        let time_with_all = Time {
+            hours: 2,
+            minutes: 10,
+            seconds: 5,
+        };
+        assert_eq!(time_with_all.format_ruled(false, false), "2h 10m 5s"); // full
+        assert_eq!(time_with_all.format_ruled(false, true), "2h 10m"); // omit seconds
+        assert_eq!(time_with_all.format_ruled(true, true), "2h"); // omit minutes and seconds
+
+        let time_minutes_only = Time {
+            hours: 0,
+            minutes: 30,
+            seconds: 0,
+        };
+        assert_eq!(time_minutes_only.format_ruled(false, false), "30m 0s"); // minutes-only full
+        assert_eq!(time_minutes_only.format_ruled(false, true), "30m"); // minutes-only omit seconds
+
+        let time_seconds_only = Time {
+            hours: 0,
+            minutes: 0,
+            seconds: 45,
+        };
+        assert_eq!(time_seconds_only.format_ruled(false, false), "45s"); // seconds-only
+        assert_eq!(time_seconds_only.format_ruled(true, true), "45s"); // seconds-only with omit flags
+    }
 }

@@ -120,7 +120,7 @@ where
     Ok(())
 }
 
-fn format_laps(laps: &[StdDuration]) -> String {
+pub(crate) fn format_laps(laps: &[StdDuration]) -> String {
     laps.iter()
         .enumerate()
         .map(|(i, lap)| {
@@ -160,4 +160,42 @@ where
         cursor::Show,
         terminal::LeaveAlternateScreen
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_laps_empty() {
+        assert_eq!(format_laps(&[]), "");
+    }
+
+    #[test]
+    fn test_format_laps_single_seconds() {
+        let laps = vec![StdDuration::from_secs(5)];
+        assert_eq!(format_laps(&laps), "[1] 5s");
+    }
+
+    #[test]
+    fn test_format_laps_single_minutes() {
+        let laps = vec![StdDuration::from_secs(90)];
+        assert_eq!(format_laps(&laps), "[1] 1m 30s");
+    }
+
+    #[test]
+    fn test_format_laps_single_hours() {
+        let laps = vec![StdDuration::from_secs(3661)];
+        assert_eq!(format_laps(&laps), "[1] 1h 1m 1s");
+    }
+
+    #[test]
+    fn test_format_laps_multiple() {
+        let laps = vec![
+            StdDuration::from_secs(30),
+            StdDuration::from_secs(90),
+            StdDuration::from_secs(3661),
+        ];
+        assert_eq!(format_laps(&laps), "[1] 30s  [2] 1m 30s  [3] 1h 1m 1s");
+    }
 }
