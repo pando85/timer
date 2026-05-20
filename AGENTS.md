@@ -238,48 +238,17 @@ When adding new features:
 
 ## Release Workflow
 
-When running a release (`/release` command), follow these mandatory steps:
+Use the **release skill** (`.opencode/skills/release/SKILL.md`) for detailed release instructions. The release script (`.ci/release.sh`) automates the full process.
 
-### 1. Unshallow Git Repository (CRITICAL)
+Key steps:
+1. Verify clean state (master, no uncommitted changes, up to date)
+2. **Unshallow repo if needed** — critical for git-cliff changelog accuracy
+3. Determine version bump (MAJOR/MINOR/PATCH)
+4. Create release branch, update `Cargo.toml`, run `cargo update -p timer-cli`
+5. Run `make update-changelog`
+6. Commit, push, create PR
 
-**MUST be done before running git-cliff.** Without full git history, git-cliff will produce incomplete changelog.
-
-```bash
-# Check if repository is shallow
-git rev-parse --is-shallow-repository
-
-# If "true", unshallow immediately
-git fetch --unshallow --quiet
-git fetch --tags --quiet
-```
-
-### 2. Version Bump
-
-Edit `Cargo.toml` to bump the version number (patch/minor/major as appropriate).
-
-### 3. Update Lock File
-
-```bash
-cargo update -p timer-cli
-```
-
-### 4. Update CHANGELOG
-
-```bash
-make update-changelog
-```
-
-This runs `git cliff -t v<VERSION> -u -p CHANGELOG.md`.
-
-### 5. Commit and Create PR
-
-```bash
-git add .
-git commit -m "release: Version <VERSION>"
-git checkout -b release/v<VERSION>
-git push origin release/v<VERSION>
-git-api pr create --title "release: Version <VERSION>" --body "..."
-```
+After merge, CI auto-tags and publishes to crates.io, GitHub Releases, and AUR.
 
 ## Git Rules
 
