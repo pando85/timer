@@ -1,184 +1,117 @@
-# Testing Plan — Timer CLI
+# Testing Plan — Hardware & Concurrency Layer
 
-Ensure behavioral stability across future releases by adding comprehensive tests.
+Cover the untested sound/beep/countdown layer that caused the 0.11.3 regression.
 
-**Current state:** 11 tests in 3 files (`timer.rs`, `time.rs`, `opts.rs`)
+**Current state:** 63 tests covering pure logic, CLI parsing, rendering, and binary exit codes.
+
+**Goal:** Make `countdown()` completion logic (parallel sound+beep, silence mode, terminal bell)
+and `play_beep()`/`play_sound()` orchestration testable without hardware.
 
 ## Safety Rules
 
 - `cargo test` must pass after every checkbox
 - Each phase is independently verifiable
-- Phases 0-3 require no hardware (no audio, no display, no special devices)
-- Phase 4 requires a built binary but uses `--silence` to avoid audio
+- No behavior changes to production code — only refactoring for testability
 
 ---
 
-## Phase 0: Add dev-dependencies
+## Phase 1: Extract alert traits
 
-- [ ] Add to `Cargo.toml` `[dev-dependencies]`:
-  - `assert_cmd = "2"` — CLI binary testing
-  - `insta = "1"` — snapshot testing
-  - `predicates = "3"` — composable assertions
-- [ ] `cargo test` passes (existing 11 tests unchanged)
+Introduce trait abstractions so `countdown()` doesn't depend on concrete hardware.
 
----
+### 1.1 Create `src/alert.rs`
 
-## Phase 1: Pure function tests (no new deps needed)
+- [ ] Define `Alert` trait with `fn play(&self) -> Result<()>`
+- [ ] Implement `BeepAlert` struct wrapping existing `beep::beep()` logic from `timer::play_beep()`
+- [ ] Implement `SoundAlert` struct wrapping existing `Sound::new()` + `play()` from `timer::play_sound()`
+- [ ] Implement `SilentAlert` struct (no-op, for `--silence` mode)
+- [ ] Implement `TerminalBellAlert` struct (prints `\x07`)
+- [ ] Unit test: `SilentAlert::play()` returns `Ok(())`
+- [ ] Unit test: `TerminalBellAlert` writes bell character
+- [ ] Register module in `main.rs`
+- [ ] **Verify:** `cargo test` passes, no behavior change
 
-### 1.1 `Time::format()` — `src/time.rs`
+### 1.2 Refactor `countdown()` to use traits
 
-- [ ] `0h 0m 0s` → `"0h 0m 0s"`
-- [ ] `1h 0m 0s` → `"1h 0m 0s"`
-- [ ] `0h 30m 0s` → `"0h 30m 0s"`
-- [ ] `0h 0m 45s` → `"0h 0m 45s"`
-- [ ] `2h 10m 5s` → `"2h 10m 5s"`
-- [ ] `99h 59m 59s` → `"99h 59m 59s"`
-
-### 1.2 `Time::format_ruled()` — `src/time.rs`
-
-- [ ] With no omission flags → full format
-- [ ] Omit seconds → `"2h 10m"`
-- [ ] Omit minutes → `"2h"`
-- [ ] Omit seconds and minutes → minimal output
-
-### 1.3 `stopwatch::handle_key()` — `src/stopwatch.rs`
-
-- [ ] `Space` → `Action::Pause`
-- [ ] `p` → `Action::Pause`
-- [ ] `l` → `Action::Lap`
-- [ ] `Enter` → `Action::Lap`
-- [ ] `r` → `Action::Reset`
-- [ ] `q` → `Action::Quit`
-- [ ] `Ctrl+C` → `Action::Quit`
-- [ ] Unknown key → `Action::Noop`
-
-### 1.4 `State` transitions — `src/stopwatch.rs`
-
-- [ ] `State::Running` → `is_running()` returns `true`
-- [ ] `State::Paused` → `is_running()` returns `false`
-- [ ] `Running::toggle_pause()` → `Paused` (accumulated preserved)
-- [ ] `Paused::toggle_pause()` → `Running` (accumulated preserved)
-- [ ] `reset()` → fresh `Running` state
-
-### 1.5 `ui::format_laps()` — `src/ui.rs`
-
-- [ ] Empty laps → empty string
-- [ ] Single lap → formatted string with lap number and time
-- [ ] Multiple laps → numbered list with times
-
-### 1.6 `parse_counter_time()` edge cases — `src/timer.rs`
-
-- [ ] `"0s"` → `Some(Duration::ZERO)`
-- [ ] `""` → `None`
-- [ ] `"abc"` → `None`
-- [ ] `"999999h"` → `Some(...)` (verify no panic)
-- [ ] `"1h1h"` → `None` or handled gracefully
-- [ ] `"10"` (bare number) → `Some(10s)`
-
-### 1.7 `parse_end_time()` edge cases — `src/timer.rs`
-
-- [ ] `"00:00"` → parses correctly
-- [ ] `"23:59:59"` → parses correctly
-- [ ] `"25:00"` → `None` (invalid hour)
-- [ ] `"12:60"` → `None` (invalid minute)
-- [ ] `"abc"` → `None`
-
-- [ ] **Verify:** `cargo test` passes, test count increased from 11
+- [ ] Change `countdown()` signature to accept `&dyn Alert` or generic `A: Alert` for beep and sound
+- [ ] Replace direct `play_beep()` / `play_sound()` calls with trait methods
+- [ ] Replace `std::thread::spawn` with a pluggable concurrency strategy (or keep spawn but pass closures)
+- [ ] Keep existing behavior — call sites in `main.rs` construct concrete types
+- [ ] **Verify:** `cargo test` passes, `timer 1s --silence` still works manually
 
 ---
 
-## Phase 2: Snapshot tests (needs `insta` from Phase 0)
+## Phase 2: Test countdown completion logic
 
-### 2.1 `Figlet::convert()` — `src/figlet/mod.rs`
+Test the alert orchestration that was broken in 0.11.2 (sequential vs parallel).
 
-- [ ] Snapshot: digits `"0"` through `"9"`
-- [ ] Snapshot: `":00:00"` (colon + seconds fragment)
-- [ ] Snapshot: `"1h 30m 5s"` (full timer string)
+### 2.1 Countdown alert tests
 
-### 2.2 `Time::render()` — `src/time.rs`
+- [ ] Test silence mode: no alerts fired when `--silence` is set
+- [ ] Test terminal bell: bell character written when `--terminal-bell` is set
+- [ ] Test beep-only path: `BeepAlert::play()` called correct number of times
+- [ ] Test parallel execution: both `BeepAlert` and `SoundAlert` are invoked (not sequential)
+- [ ] Test thread panic: `SoundAlert` thread panic is caught and returns error
+- [ ] **Verify:** `cargo test` passes
 
-- [ ] Snapshot: `120x30` terminal → full format rendered
-- [ ] Snapshot: `60x20` terminal → degraded format (no seconds)
-- [ ] Snapshot: `20x10` terminal → minimal or plain text fallback
+### 2.2 `play_beep()` orchestration tests
 
-### 2.3 `Time::try_render()` — `src/time.rs`
+Using mock `Alert` implementations that record calls:
 
-- [ ] Very small size (e.g. `10x5`) → returns `None`
-- [ ] Verify degradation logic: each step omits more parts
-
-- [ ] **Verify:** `cargo insta review` to accept snapshots, then `cargo test` passes
-
----
-
-## Phase 3: CLI parsing tests — `src/opts.rs`
-
-### 3.1 Valid invocations (`Opts::try_parse_from()`)
-
-- [ ] `timer 5m` → `Opts { time: ["5m"], silence: false, loop: false, terminal_bell: false }`
-- [ ] `timer 1h30m45s` → parses time correctly
-- [ ] `timer stopwatch` → `command: Some(Command::Stopwatch)`
-- [ ] `timer --silence 10s` → `silence: true`
-- [ ] `timer -l -s 5m` → `loop: true, silence: true`
-
-### 3.2 Invalid invocations
-
-- [ ] `timer foo` → returns error (not a valid duration or time)
-- [ ] `timer --invalid` → returns error (unknown flag)
-- [ ] `timer` (no args) → verify current behavior (may be valid with no time)
-
-### 3.3 Default values
-
-- [ ] `silence` defaults to `false`
-- [ ] `loop` defaults to `false`
-- [ ] `terminal_bell` defaults to `false`
-
+- [ ] Verify `BEEP_REPETITIONS` (5) calls to `play()`
+- [ ] Verify fallback: when beep fails, sleep replaces it (no panic)
 - [ ] **Verify:** `cargo test` passes
 
 ---
 
-## Phase 4: Binary integration tests (needs `assert_cmd` from Phase 0)
+## Phase 3: Test `resize_term()` and `parse_time()`
 
-Create `tests/integration.rs`.
+### 3.1 `resize_term()` — `src/timer.rs`
 
-### 4.1 Happy paths
+- [ ] Test positive counter: draws remaining time
+- [ ] Test zero/negative counter: draws `Duration::ZERO`
+- [ ] Both need a mock writer (`Vec<u8>`) — already generic over `W: io::Write`
+- [ ] **Verify:** `cargo test` passes
 
-- [ ] `timer 1s` — exits with code 0
-- [ ] `timer --silence 1s` — exits 0 without audio
-- [ ] `timer -t 1s` — exits 0 (terminal bell mode)
+### 3.2 `parse_time()` — `src/main.rs`
 
-### 4.2 Error paths
-
-- [ ] `timer foo` — exits non-zero, stderr contains error message
-- [ ] `timer --invalid-flag` — exits non-zero
-
-### 4.3 Stopwatch
-
-- [ ] `timer stopwatch` — starts then killed with SIGTERM, exits cleanly
-
-### 4.4 Loop mode
-
-- [ ] `timer --loop --silence 1s` — runs at least one cycle, then killed
-
+- [ ] Test duration input (`"5m"`) returns a future `OffsetDateTime`
+- [ ] Test target time input (`"12:00"`) returns today's or tomorrow's date
+- [ ] Test invalid input returns `None`
+- [ ] Note: function uses `OffsetDateTime::now_utc()` — may need `#[cfg(test)]` time injection
 - [ ] **Verify:** `cargo test` passes
 
 ---
 
-## Phase 5: CI integration
+## Phase 4: Edge-case and regression tests
 
-- [ ] Check if GitHub Actions workflow exists and includes `cargo test`
-- [ ] Add `cargo test` step to CI pipeline if missing
-- [ ] Verify CI passes on push
+- [ ] Test `BEEP_FREQ` constant hasn't changed (440 Hz)
+- [ ] Test `BEEP_REPETITIONS` constant hasn't changed (5)
+- [ ] Test `SOUND_START_DELAY` < `BEEP_DELAY` (timing invariant for parallel play)
+- [ ] Regression: test that countdown with both beep and sound uses threading (not sequential)
+- [ ] **Verify:** `cargo test` passes
+
+---
+
+## Not in scope (requires hardware or unsafe mocking)
+
+| Function | Reason |
+|----------|--------|
+| `beep::driver_evdev()` | Unsafe FFI, needs real device |
+| `beep::driver_console()` | Unsafe ioctl, needs real device |
+| `beep::get_driver()` | Runtime hardware detection |
+| `beep::get_device()` | Filesystem device discovery |
+| `Sound::new()` | Requires audio device |
+| Signal handling in `run_countdown()` | Complex OS signal interaction |
 
 ---
 
 ## Summary
 
-| Phase | New tests (est.) | New dev-deps | Risk |
-|-------|-----------------|--------------|------|
-| 0     | 0               | 3            | None |
-| 1     | ~30             | 0            | Very low |
-| 2     | ~10             | 0 (insta)    | Low |
-| 3     | ~12             | 0            | Low |
-| 4     | ~6              | 0 (assert_cmd)| Low |
-| 5     | 0               | 0            | Low |
-| **Total** | **~58**     | **3**        | — |
+| Phase | New tests (est.) | Refactoring needed | Risk |
+|-------|-----------------|-------------------|------|
+| 1     | 2               | New `alert.rs` module | Low |
+| 2     | 6               | Trait-based countdown | Medium |
+| 3     | 5               | Minor (time injection) | Low |
+| 4     | 4               | None | Very low |
+| **Total** | **~17**      | 1 new module + trait refactor | — |
