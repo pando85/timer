@@ -1,3 +1,4 @@
+mod alert;
 mod beep;
 mod constants;
 mod figlet;
