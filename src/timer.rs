@@ -103,6 +103,31 @@ where
     }
 }
 
+fn play_beep() -> Result<()> {
+    for _ in 0..BEEP_REPETITIONS {
+        sleep(stdDuration::from_millis(SOUND_START_DELAY));
+        if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
+            sleep(stdDuration::from_millis(BEEP_DURATION));
+        }
+
+        let remaining_delay = BEEP_DELAY.saturating_sub(SOUND_START_DELAY);
+        if remaining_delay > 0 {
+            sleep(stdDuration::from_millis(remaining_delay));
+        }
+    }
+    Ok(())
+}
+
+fn play_sound() -> Result<()> {
+    let sound = Sound::new()?;
+
+    for _ in 0..BEEP_REPETITIONS {
+        sound.play()?;
+        sleep(stdDuration::from_millis(BEEP_DELAY));
+    }
+    Ok(())
+}
+
 pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
 where
     W: io::Write,
@@ -123,23 +148,9 @@ where
                 }
 
                 if !opts.silence {
-                    match Sound::new() {
-                        Ok(sound) => {
-                            for _ in 0..BEEP_REPETITIONS {
-                                sleep(stdDuration::from_millis(SOUND_START_DELAY));
-                                if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err()
-                                {
-                                    sleep(stdDuration::from_millis(BEEP_DURATION));
-                                }
-
-                                if sound.play().is_err() {
-                                    break;
-                                }
-                                sleep(stdDuration::from_millis(BEEP_DELAY));
-                            }
-                        }
-                        Err(e) => return Err(e),
-                    }
+                    let sound_handle = std::thread::spawn(|| play_sound().unwrap());
+                    play_beep()?;
+                    sound_handle.join().map_err(|_| "Sound thread panicked")?;
                 }
                 return Ok(());
             }
