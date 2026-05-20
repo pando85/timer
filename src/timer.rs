@@ -1,18 +1,15 @@
 use crate::Result;
-use crate::beep::beep;
-use crate::constants::{BEEP_DELAY, BEEP_DURATION, BEEP_FREQ, BEEP_REPETITIONS, SOUND_START_DELAY};
+use crate::alert::{Alert, BeepAlert, SoundAlert, write_terminal_bell};
 use crate::opts::Opts;
-use crate::sound::Sound;
 use crate::ui;
 
 use std::io;
+use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
 use time::{Duration, OffsetDateTime, Time, format_description};
-
-pub const BELL_CHART: char = '';
 
 pub fn parse_counter_time(s: &str) -> Option<Duration> {
     let re = Regex::new(
@@ -103,34 +100,16 @@ where
     }
 }
 
-fn play_beep() -> Result<()> {
-    for _ in 0..BEEP_REPETITIONS {
-        sleep(stdDuration::from_millis(SOUND_START_DELAY));
-        if beep(BEEP_FREQ, stdDuration::from_millis(BEEP_DURATION)).is_err() {
-            sleep(stdDuration::from_millis(BEEP_DURATION));
-        }
-
-        let remaining_delay = BEEP_DELAY.saturating_sub(SOUND_START_DELAY);
-        if remaining_delay > 0 {
-            sleep(stdDuration::from_millis(remaining_delay));
-        }
-    }
-    Ok(())
-}
-
-fn play_sound() -> Result<()> {
-    let sound = Sound::new()?;
-
-    for _ in 0..BEEP_REPETITIONS {
-        sound.play()?;
-        sleep(stdDuration::from_millis(BEEP_DELAY));
-    }
-    Ok(())
-}
-
-pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
+pub fn countdown_with_alerts<W, B>(
+    w: &mut W,
+    end: OffsetDateTime,
+    opts: &Opts,
+    beep_alert: &B,
+    sound_alert: Arc<dyn Alert + Send + Sync>,
+) -> Result<()>
 where
     W: io::Write,
+    B: Alert + ?Sized,
 {
     loop {
         match end - OffsetDateTime::now_utc() {
@@ -144,12 +123,13 @@ where
                 ui::draw(w, Duration::ZERO)?;
 
                 if opts.terminal_bell {
-                    println!("{BELL_CHART}");
+                    write_terminal_bell(w)?;
                 }
 
                 if !opts.silence {
-                    let sound_handle = std::thread::spawn(|| play_sound().unwrap());
-                    play_beep()?;
+                    let sa = Arc::clone(&sound_alert);
+                    let sound_handle = std::thread::spawn(move || sa.play().unwrap());
+                    beep_alert.play()?;
                     sound_handle.join().map_err(|_| "Sound thread panicked")?;
                 }
                 return Ok(());
@@ -158,6 +138,12 @@ where
     }
 }
 
+pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
+where
+    W: io::Write,
+{
+    countdown_with_alerts(w, end, opts, &BeepAlert, Arc::new(SoundAlert))
+}
 #[cfg(test)]
 mod tests {
     use super::*;
