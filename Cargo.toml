@@ -28,6 +28,9 @@ libc = "0.2"
 nix = { version = "0.31", features = ["ioctl"] }
 
 [dev-dependencies]
+assert_cmd = "2"
+insta = "1"
+predicates = "3"
 time = { version = "0.3", features = ["macros"] }
 
 
