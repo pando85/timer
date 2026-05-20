@@ -10,7 +10,6 @@ use std::thread::sleep;
 use std::time::Duration as stdDuration;
 
 use regex::{Regex, RegexSet};
-use tailcall::tailcall;
 use time::{Duration, OffsetDateTime, Time, format_description};
 
 pub const BELL_CHART: char = '';
@@ -104,26 +103,25 @@ where
     }
 }
 
-#[tailcall]
 pub fn countdown<W>(w: &mut W, end: OffsetDateTime, opts: &Opts) -> Result<()>
 where
     W: io::Write,
 {
-    match end - OffsetDateTime::now_utc() {
-        counter if counter > Duration::ZERO => match ui::draw(w, counter) {
-            Ok(_) => {
-                sleep(stdDuration::from_secs(1));
-                countdown(w, end, opts)
-            }
-            Err(e) => Err(e),
-        },
-        _ => match ui::draw(w, Duration::ZERO) {
-            Ok(_) => {
+    loop {
+        match end - OffsetDateTime::now_utc() {
+            counter if counter > Duration::ZERO => match ui::draw(w, counter) {
+                Ok(_) => {
+                    sleep(stdDuration::from_secs(1));
+                }
+                Err(e) => return Err(e),
+            },
+            _ => {
+                ui::draw(w, Duration::ZERO)?;
+
                 if opts.terminal_bell {
                     println!("{BELL_CHART}");
                 }
 
-                let mut result = Ok(());
                 if !opts.silence {
                     match Sound::new() {
                         Ok(sound) => {
@@ -140,13 +138,12 @@ where
                                 sleep(stdDuration::from_millis(BEEP_DELAY));
                             }
                         }
-                        Err(e) => result = Err(e),
+                        Err(e) => return Err(e),
                     }
                 }
-                result
+                return Ok(());
             }
-            Err(e) => Err(e),
-        },
+        }
     }
 }
 
