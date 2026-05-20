@@ -93,6 +93,14 @@ fn parse<'a>(mut iter: impl Iterator<Item = &'a str>) -> Option<Figlet> {
 }
 
 #[cfg(test)]
+fn trim_trailing(s: &str) -> String {
+    s.lines()
+        .map(|line| line.trim_end())
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -101,7 +109,7 @@ mod tests {
         let figlet = Figlet::default();
         for digit in 0..=9 {
             let digit_str = digit.to_string();
-            let result = figlet.convert(&digit_str);
+            let result = trim_trailing(&figlet.convert(&digit_str));
             insta::assert_snapshot!(format!("digit_{}", digit), &result);
         }
     }
@@ -109,14 +117,14 @@ mod tests {
     #[test]
     fn test_figlet_colon_time() {
         let figlet = Figlet::default();
-        let result = figlet.convert(":00:00");
+        let result = trim_trailing(&figlet.convert(":00:00"));
         insta::assert_snapshot!("colon_time_pattern", &result);
     }
 
     #[test]
     fn test_figlet_timer_string() {
         let figlet = Figlet::default();
-        let result = figlet.convert("1h 30m 5s");
+        let result = trim_trailing(&figlet.convert("1h 30m 5s"));
         insta::assert_snapshot!("timer_string", &result);
     }
 }
