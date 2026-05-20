@@ -147,8 +147,57 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    #[cfg(test)]
+    use crate::alert::SilentAlert;
+    use crate::alert::{Alert, AlertCallLog, MockAlert};
+    use crate::constants::{BEEP_DELAY, BEEP_FREQ, BEEP_REPETITIONS, SOUND_START_DELAY};
+    use clap::Parser;
+    use std::sync::{Arc, Mutex};
     use time::macros::time;
+
+    #[test]
+    #[allow(clippy::assertions_on_constants)]
+    fn test_constants_beep_freq_unchanged() {
+        assert_eq!(BEEP_FREQ, 440);
+    }
+
+    #[test]
+    #[allow(clippy::assertions_on_constants)]
+    fn test_constants_beep_repetitions_unchanged() {
+        assert_eq!(BEEP_REPETITIONS, 5);
+    }
+
+    #[test]
+    #[allow(clippy::assertions_on_constants)]
+    fn test_constants_sound_start_delay_less_than_beep_delay() {
+        assert!(SOUND_START_DELAY <= BEEP_DELAY);
+    }
+
+    #[test]
+    fn test_countdown_uses_parallel_sound_and_beep() {
+        use crate::opts::Opts;
+
+        let mut opts = Opts::try_parse_from(["timer", "1s"]).unwrap();
+        opts.silence = false;
+
+        let log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let beep_alert = MockAlert::new(Arc::clone(&log), "beep");
+        let sound_alert = MockAlert::new(Arc::clone(&log), "sound");
+        let sound_alert_arc = Arc::new(sound_alert) as Arc<dyn Alert + Send + Sync>;
+
+        // Create a countdown that ends in the past (immediately complete)
+        let end_time = OffsetDateTime::now_utc() - Duration::seconds(1);
+        let mut output = Vec::new();
+
+        countdown_with_alerts(&mut output, end_time, &opts, &beep_alert, sound_alert_arc).unwrap();
+
+        let log_guard = log.lock().unwrap();
+        let calls: Vec<&str> = log_guard.calls.clone();
+
+        // Both beep and sound should have been called
+        assert!(calls.contains(&"beep"));
+        assert!(calls.contains(&"sound"));
+    }
 
     #[test]
     fn test_parse_counter_time() {
@@ -314,5 +363,171 @@ mod tests {
         let date = parse_end_time("13:45:43.999").unwrap();
         let expected_date = now.replace_time(time!(13:45:43.999));
         assert_eq!(date.to_hms_milli(), expected_date.to_hms_milli());
+    }
+
+    #[test]
+    fn test_countdown_silence_mode() {
+        use crate::opts::Opts;
+        use std::io::Cursor;
+
+        let mut buffer = Cursor::new(Vec::new());
+        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let opts = Opts {
+            command: None,
+            r#loop: false,
+            silence: true,
+            terminal_bell: false,
+            time: vec!["1s".to_string()],
+        };
+
+        let beep_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let beep_alert = MockAlert::new(beep_log.clone(), "beep");
+        let sound_alert = Arc::new(SilentAlert);
+
+        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+
+        assert!(result.is_ok());
+        // Verify beep was not called in silence mode
+        let log = beep_log.lock().unwrap();
+        assert!(log.calls.is_empty());
+    }
+
+    #[test]
+    fn test_countdown_terminal_bell() {
+        use crate::opts::Opts;
+        use std::io::Cursor;
+
+        let mut buffer = Cursor::new(Vec::new());
+        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let opts = Opts {
+            command: None,
+            r#loop: false,
+            silence: true,
+            terminal_bell: true,
+            time: vec!["1s".to_string()],
+        };
+
+        let beep_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let beep_alert = MockAlert::new(beep_log.clone(), "beep");
+        let sound_alert = Arc::new(SilentAlert);
+
+        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+
+        assert!(result.is_ok());
+        // Verify terminal bell character is in the output
+        let output = buffer.into_inner();
+        assert!(output.contains(&0x07)); // Bell character \x07
+    }
+
+    #[test]
+    fn test_countdown_beep_called() {
+        use crate::opts::Opts;
+        use std::io::Cursor;
+
+        let mut buffer = Cursor::new(Vec::new());
+        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let opts = Opts {
+            command: None,
+            r#loop: false,
+            silence: false, // Enable alerts
+            terminal_bell: false,
+            time: vec!["1s".to_string()],
+        };
+
+        let beep_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let sound_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let beep_alert = MockAlert::new(beep_log.clone(), "beep");
+        let sound_alert = Arc::new(MockAlert::new(sound_log.clone(), "sound"));
+
+        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+
+        assert!(result.is_ok());
+        // Verify beep was called
+        let log = beep_log.lock().unwrap();
+        assert!(log.calls.contains(&"beep"));
+    }
+
+    #[test]
+    fn test_countdown_sound_and_beep_parallel() {
+        use crate::opts::Opts;
+        use std::io::Cursor;
+
+        let mut buffer = Cursor::new(Vec::new());
+        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let opts = Opts {
+            command: None,
+            r#loop: false,
+            silence: false, // Enable alerts
+            terminal_bell: false,
+            time: vec!["1s".to_string()],
+        };
+
+        let beep_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let sound_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let beep_alert = MockAlert::new(beep_log.clone(), "beep");
+        let sound_alert = Arc::new(MockAlert::new(sound_log.clone(), "sound"));
+
+        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+
+        assert!(result.is_ok());
+        // Verify both beep and sound were called
+        let beep_calls = beep_log.lock().unwrap();
+        let sound_calls = sound_log.lock().unwrap();
+        assert!(beep_calls.calls.contains(&"beep"));
+        assert!(sound_calls.calls.contains(&"sound"));
+    }
+
+    #[test]
+    fn test_countdown_sound_thread_panic_catches() {
+        use crate::opts::Opts;
+        use std::io::Cursor;
+
+        // Define PanicAlert locally within the test
+        struct PanicAlert;
+        impl Alert for PanicAlert {
+            fn play(&self) -> Result<()> {
+                panic!("Sound thread panicked");
+            }
+        }
+
+        let mut buffer = Cursor::new(Vec::new());
+        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let opts = Opts {
+            command: None,
+            r#loop: false,
+            silence: false, // Enable alerts
+            terminal_bell: false,
+            time: vec!["1s".to_string()],
+        };
+
+        let beep_log = Arc::new(Mutex::new(AlertCallLog::new()));
+        let beep_alert = MockAlert::new(beep_log.clone(), "beep");
+        let sound_alert = Arc::new(PanicAlert);
+
+        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+
+        // The function should catch the panic and return an error
+        assert!(result.is_err());
+        // Verify beep was still called before the sound thread panicked
+        let log = beep_log.lock().unwrap();
+        assert!(log.calls.contains(&"beep"));
+    }
+
+    #[test]
+    fn test_resize_term_positive_counter() {
+        let mut writer = Vec::new();
+        let end = OffsetDateTime::now_utc() + Duration::seconds(60);
+        let result = resize_term(&mut writer, end);
+        assert!(result.is_ok());
+        assert!(!writer.is_empty());
+    }
+
+    #[test]
+    fn test_resize_term_zero_counter() {
+        let mut writer = Vec::new();
+        let end = OffsetDateTime::now_utc() - Duration::seconds(60);
+        let result = resize_term(&mut writer, end);
+        assert!(result.is_ok());
+        assert!(!writer.is_empty());
     }
 }
