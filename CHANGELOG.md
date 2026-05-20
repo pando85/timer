@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.2](https://github.com/pando85/timer/tree/v0.11.2) - 2026-05-20
+
+### Fixed
+
+- Replace tailcall recursion with loop to fix runtime panic ([8b8a621](https://github.com/pando85/timer/commit/8b8a621cc20bedd3c4cfd1ba007aede76eba1422))
+
+### Build
+
+- deps: Update mindsers/changelog-reader-action action to v2.3.0 ([1d5793b](https://github.com/pando85/timer/commit/1d5793b76c081332205c458b739677be05566f11))
+
 ## [v0.11.1](https://github.com/pando85/timer/tree/v0.11.1) - 2026-05-18
 
 ### Added
