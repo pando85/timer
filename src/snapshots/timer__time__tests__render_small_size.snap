@@ -1,0 +1,5 @@
+---
+source: src/time.rs
+expression: "&result"
+---
+2h 10m 5s
