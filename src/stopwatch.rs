@@ -9,8 +9,8 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
 use crossterm::terminal;
 use time::Duration as TimeDuration;
 
-/// Stopwatch state machine
-enum State {
+#[cfg_attr(test, derive(Debug, PartialEq))]
+pub(crate) enum State {
     Running {
         start: Instant,
         accumulated: Duration,
@@ -28,7 +28,7 @@ impl State {
         }
     }
 
-    fn toggle_pause(self) -> Self {
+    pub(crate) fn toggle_pause(self) -> Self {
         match self {
             State::Running { start, accumulated } => State::Paused {
                 accumulated: accumulated + start.elapsed(),
@@ -40,19 +40,18 @@ impl State {
         }
     }
 
-    fn reset() -> Self {
+    pub(crate) fn reset() -> Self {
         State::Running {
             start: Instant::now(),
             accumulated: Duration::ZERO,
         }
     }
 
-    fn is_running(&self) -> bool {
+    pub(crate) fn is_running(&self) -> bool {
         matches!(self, State::Running { .. })
     }
 }
 
-/// Run the stopwatch loop
 pub fn run<W: io::Write>(w: &mut W) -> Result<()> {
     terminal::enable_raw_mode()?;
 
@@ -67,14 +66,12 @@ pub fn run<W: io::Write>(w: &mut W) -> Result<()> {
         let elapsed = state.elapsed();
         let current_secs = elapsed.as_secs();
 
-        // Only redraw if seconds changed (reduces flickering)
         if current_secs != last_drawn_secs {
             let time_duration = TimeDuration::new(elapsed.as_secs() as i64, 0);
             ui::draw_with_laps(w, time_duration, &laps, state.is_running())?;
             last_drawn_secs = current_secs;
         }
 
-        // Poll for events with a short timeout
         if event::poll(Duration::from_millis(50))?
             && let Event::Key(key_event) = event::read()?
         {
@@ -82,27 +79,23 @@ pub fn run<W: io::Write>(w: &mut W) -> Result<()> {
                 Action::Quit => break,
                 Action::TogglePause => {
                     state = state.toggle_pause();
-                    // Force redraw on state change
                     last_drawn_secs = u64::MAX;
                 }
                 Action::Lap => {
                     if state.is_running() {
                         laps.push(state.elapsed());
-                        // Force redraw on lap
                         last_drawn_secs = u64::MAX;
                     }
                 }
                 Action::Reset => {
                     laps.clear();
                     state = State::reset();
-                    // Force redraw on reset
                     last_drawn_secs = u64::MAX;
                 }
                 Action::None => {}
             }
         }
 
-        // Small sleep to prevent busy-waiting
         if state.is_running() {
             sleep(Duration::from_millis(10));
         }
@@ -112,7 +105,8 @@ pub fn run<W: io::Write>(w: &mut W) -> Result<()> {
     Ok(())
 }
 
-enum Action {
+#[cfg_attr(test, derive(Debug, PartialEq))]
+pub(crate) enum Action {
     Quit,
     TogglePause,
     Lap,
@@ -120,7 +114,7 @@ enum Action {
     None,
 }
 
-fn handle_key(key: KeyEvent) -> Action {
+pub(crate) fn handle_key(key: KeyEvent) -> Action {
     match key.code {
         KeyCode::Char('q') => Action::Quit,
         KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => Action::Quit,
@@ -128,5 +122,101 @@ fn handle_key(key: KeyEvent) -> Action {
         KeyCode::Char('l') | KeyCode::Enter => Action::Lap,
         KeyCode::Char('r') => Action::Reset,
         _ => Action::None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[test]
+    fn test_handle_key_space() {
+        let key = KeyEvent::new(KeyCode::Char(' '), KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::TogglePause);
+    }
+
+    #[test]
+    fn test_handle_key_p() {
+        let key = KeyEvent::new(KeyCode::Char('p'), KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::TogglePause);
+    }
+
+    #[test]
+    fn test_handle_key_l() {
+        let key = KeyEvent::new(KeyCode::Char('l'), KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::Lap);
+    }
+
+    #[test]
+    fn test_handle_key_enter() {
+        let key = KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::Lap);
+    }
+
+    #[test]
+    fn test_handle_key_r() {
+        let key = KeyEvent::new(KeyCode::Char('r'), KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::Reset);
+    }
+
+    #[test]
+    fn test_handle_key_q() {
+        let key = KeyEvent::new(KeyCode::Char('q'), KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::Quit);
+    }
+
+    #[test]
+    fn test_handle_key_ctrl_c() {
+        let key = KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL);
+        assert_eq!(handle_key(key), Action::Quit);
+    }
+
+    #[test]
+    fn test_handle_key_unknown() {
+        let key = KeyEvent::new(KeyCode::Char('x'), KeyModifiers::NONE);
+        assert_eq!(handle_key(key), Action::None);
+    }
+
+    #[test]
+    fn test_state_is_running_running() {
+        let state = State::Running {
+            start: Instant::now(),
+            accumulated: Duration::ZERO,
+        };
+        assert!(state.is_running());
+    }
+
+    #[test]
+    fn test_state_is_running_paused() {
+        let state = State::Paused {
+            accumulated: Duration::ZERO,
+        };
+        assert!(!state.is_running());
+    }
+
+    #[test]
+    fn test_state_reset_is_running() {
+        let state = State::reset();
+        assert!(state.is_running());
+    }
+
+    #[test]
+    fn test_state_toggle_pause_running_to_paused() {
+        let initial_state = State::Running {
+            start: Instant::now(),
+            accumulated: Duration::ZERO,
+        };
+        let toggled_state = initial_state.toggle_pause();
+        assert!(!toggled_state.is_running());
+    }
+
+    #[test]
+    fn test_state_toggle_pause_paused_to_running() {
+        let initial_state = State::Paused {
+            accumulated: Duration::ZERO,
+        };
+        let toggled_state = initial_state.toggle_pause();
+        assert!(toggled_state.is_running());
     }
 }

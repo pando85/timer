@@ -193,6 +193,73 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_counter_time_zero() {
+        assert_eq!(Duration::seconds(0), parse_counter_time("0s").unwrap());
+    }
+
+    #[test]
+    fn test_parse_counter_time_empty() {
+        assert_eq!(None, parse_counter_time(""));
+    }
+
+    #[test]
+    fn test_parse_counter_time_invalid() {
+        assert_eq!(None, parse_counter_time("abc"));
+    }
+
+    #[test]
+    fn test_parse_counter_time_large() {
+        assert_eq!(
+            Duration::seconds(3599996400),
+            parse_counter_time("999999h").unwrap()
+        );
+    }
+
+    #[test]
+    fn test_parse_counter_time_duplicate_units() {
+        // This should either return Some or None, but shouldn't panic
+        let result = parse_counter_time("1h1h");
+        // Just ensure it doesn't panic
+        assert!(result.is_some() || result.is_none());
+    }
+
+    #[test]
+    fn test_parse_counter_time_bare_number() {
+        assert_eq!(Duration::seconds(10), parse_counter_time("10").unwrap());
+    }
+
+    #[test]
+    fn test_parse_counter_time_only_hours() {
+        assert_eq!(Duration::seconds(18000), parse_counter_time("5h").unwrap());
+    }
+
+    #[test]
+    fn test_parse_counter_time_hours_minutes() {
+        assert_eq!(
+            Duration::seconds(5400),
+            parse_counter_time("1h30m").unwrap()
+        );
+    }
+
+    #[test]
+    fn test_parse_counter_time_hours_minutes_seconds() {
+        assert_eq!(
+            Duration::seconds(3723),
+            parse_counter_time("1h2m3s").unwrap()
+        );
+    }
+
+    #[test]
+    fn test_parse_counter_time_with_spaces() {
+        let result = parse_counter_time("1h 30m");
+        if let Some(dur) = result {
+            assert_eq!(Duration::seconds(5400), dur);
+        } else {
+            assert_eq!(None, result);
+        }
+    }
+
+    #[test]
     fn test_parse_end_time() {
         let now = OffsetDateTime::now_local().ok().unwrap();
 
@@ -223,6 +290,43 @@ mod tests {
         let now = OffsetDateTime::now_local().ok().unwrap();
         let date = parse_end_time("13:45:43.123").unwrap();
         let expected_date = now.replace_time(time!(13:45:43.123));
+        assert_eq!(date.to_hms_milli(), expected_date.to_hms_milli());
+    }
+
+    #[test]
+    fn test_parse_end_time_midnight() {
+        let now = OffsetDateTime::now_local().ok().unwrap();
+        let date = parse_end_time("00:00").unwrap();
+        let expected_date = now.replace_time(time!(00:00));
+        assert_eq!(date.to_hms(), expected_date.to_hms());
+    }
+
+    #[test]
+    fn test_parse_end_time_hms_max() {
+        let now = OffsetDateTime::now_local().ok().unwrap();
+        let date = parse_end_time("23:59:59").unwrap();
+        let expected_date = now.replace_time(time!(23:59:59));
+        assert_eq!(date.to_hms(), expected_date.to_hms());
+    }
+
+    #[test]
+    fn test_parse_end_time_invalid() {
+        assert_eq!(None, parse_end_time("abc"));
+    }
+
+    #[test]
+    fn test_parse_end_time_with_leading_zero() {
+        let now = OffsetDateTime::now_local().ok().unwrap();
+        let date = parse_end_time("08:25").unwrap();
+        let expected_date = now.replace_time(time!(08:25));
+        assert_eq!(date.to_hms(), expected_date.to_hms());
+    }
+
+    #[test]
+    fn test_parse_end_time_hms_with_millis() {
+        let now = OffsetDateTime::now_local().ok().unwrap();
+        let date = parse_end_time("13:45:43.999").unwrap();
+        let expected_date = now.replace_time(time!(13:45:43.999));
         assert_eq!(date.to_hms_milli(), expected_date.to_hms_milli());
     }
 }
