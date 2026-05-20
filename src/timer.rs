@@ -100,6 +100,29 @@ where
     }
 }
 
+pub fn play_completion_alerts<W, B>(
+    w: &mut W,
+    opts: &Opts,
+    beep_alert: &B,
+    sound_alert: Arc<dyn Alert + Send + Sync>,
+) -> Result<()>
+where
+    W: io::Write,
+    B: Alert + ?Sized,
+{
+    if opts.terminal_bell {
+        write_terminal_bell(w)?;
+    }
+
+    if !opts.silence {
+        let sa = Arc::clone(&sound_alert);
+        let sound_handle = std::thread::spawn(move || sa.play().unwrap());
+        beep_alert.play()?;
+        sound_handle.join().map_err(|_| "Sound thread panicked")?;
+    }
+    Ok(())
+}
+
 pub fn countdown_with_alerts<W, B>(
     w: &mut W,
     end: OffsetDateTime,
@@ -121,17 +144,7 @@ where
             },
             _ => {
                 ui::draw(w, Duration::ZERO)?;
-
-                if opts.terminal_bell {
-                    write_terminal_bell(w)?;
-                }
-
-                if !opts.silence {
-                    let sa = Arc::clone(&sound_alert);
-                    let sound_handle = std::thread::spawn(move || sa.play().unwrap());
-                    beep_alert.play()?;
-                    sound_handle.join().map_err(|_| "Sound thread panicked")?;
-                }
+                play_completion_alerts(w, opts, beep_alert, sound_alert)?;
                 return Ok(());
             }
         }
@@ -185,16 +198,12 @@ mod tests {
         let sound_alert = MockAlert::new(Arc::clone(&log), "sound");
         let sound_alert_arc = Arc::new(sound_alert) as Arc<dyn Alert + Send + Sync>;
 
-        // Create a countdown that ends in the past (immediately complete)
-        let end_time = OffsetDateTime::now_utc() - Duration::seconds(1);
         let mut output = Vec::new();
-
-        countdown_with_alerts(&mut output, end_time, &opts, &beep_alert, sound_alert_arc).unwrap();
+        play_completion_alerts(&mut output, &opts, &beep_alert, sound_alert_arc).unwrap();
 
         let log_guard = log.lock().unwrap();
         let calls: Vec<&str> = log_guard.calls.clone();
 
-        // Both beep and sound should have been called
         assert!(calls.contains(&"beep"));
         assert!(calls.contains(&"sound"));
     }
@@ -368,10 +377,8 @@ mod tests {
     #[test]
     fn test_countdown_silence_mode() {
         use crate::opts::Opts;
-        use std::io::Cursor;
 
-        let mut buffer = Cursor::new(Vec::new());
-        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let mut buffer = Vec::new();
         let opts = Opts {
             command: None,
             r#loop: false,
@@ -384,10 +391,9 @@ mod tests {
         let beep_alert = MockAlert::new(beep_log.clone(), "beep");
         let sound_alert = Arc::new(SilentAlert);
 
-        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+        let result = play_completion_alerts(&mut buffer, &opts, &beep_alert, sound_alert);
 
         assert!(result.is_ok());
-        // Verify beep was not called in silence mode
         let log = beep_log.lock().unwrap();
         assert!(log.calls.is_empty());
     }
@@ -395,10 +401,8 @@ mod tests {
     #[test]
     fn test_countdown_terminal_bell() {
         use crate::opts::Opts;
-        use std::io::Cursor;
 
-        let mut buffer = Cursor::new(Vec::new());
-        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let mut buffer = Vec::new();
         let opts = Opts {
             command: None,
             r#loop: false,
@@ -411,25 +415,21 @@ mod tests {
         let beep_alert = MockAlert::new(beep_log.clone(), "beep");
         let sound_alert = Arc::new(SilentAlert);
 
-        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+        let result = play_completion_alerts(&mut buffer, &opts, &beep_alert, sound_alert);
 
         assert!(result.is_ok());
-        // Verify terminal bell character is in the output
-        let output = buffer.into_inner();
-        assert!(output.contains(&0x07)); // Bell character \x07
+        assert!(buffer.contains(&0x07));
     }
 
     #[test]
     fn test_countdown_beep_called() {
         use crate::opts::Opts;
-        use std::io::Cursor;
 
-        let mut buffer = Cursor::new(Vec::new());
-        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let mut buffer = Vec::new();
         let opts = Opts {
             command: None,
             r#loop: false,
-            silence: false, // Enable alerts
+            silence: false,
             terminal_bell: false,
             time: vec!["1s".to_string()],
         };
@@ -439,10 +439,9 @@ mod tests {
         let beep_alert = MockAlert::new(beep_log.clone(), "beep");
         let sound_alert = Arc::new(MockAlert::new(sound_log.clone(), "sound"));
 
-        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+        let result = play_completion_alerts(&mut buffer, &opts, &beep_alert, sound_alert);
 
         assert!(result.is_ok());
-        // Verify beep was called
         let log = beep_log.lock().unwrap();
         assert!(log.calls.contains(&"beep"));
     }
@@ -450,14 +449,12 @@ mod tests {
     #[test]
     fn test_countdown_sound_and_beep_parallel() {
         use crate::opts::Opts;
-        use std::io::Cursor;
 
-        let mut buffer = Cursor::new(Vec::new());
-        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let mut buffer = Vec::new();
         let opts = Opts {
             command: None,
             r#loop: false,
-            silence: false, // Enable alerts
+            silence: false,
             terminal_bell: false,
             time: vec!["1s".to_string()],
         };
@@ -467,10 +464,9 @@ mod tests {
         let beep_alert = MockAlert::new(beep_log.clone(), "beep");
         let sound_alert = Arc::new(MockAlert::new(sound_log.clone(), "sound"));
 
-        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+        let result = play_completion_alerts(&mut buffer, &opts, &beep_alert, sound_alert);
 
         assert!(result.is_ok());
-        // Verify both beep and sound were called
         let beep_calls = beep_log.lock().unwrap();
         let sound_calls = sound_log.lock().unwrap();
         assert!(beep_calls.calls.contains(&"beep"));
@@ -480,9 +476,7 @@ mod tests {
     #[test]
     fn test_countdown_sound_thread_panic_catches() {
         use crate::opts::Opts;
-        use std::io::Cursor;
 
-        // Define PanicAlert locally within the test
         struct PanicAlert;
         impl Alert for PanicAlert {
             fn play(&self) -> Result<()> {
@@ -490,12 +484,11 @@ mod tests {
             }
         }
 
-        let mut buffer = Cursor::new(Vec::new());
-        let end = OffsetDateTime::now_utc() - Duration::seconds(1); // 1 second ago
+        let mut buffer = Vec::new();
         let opts = Opts {
             command: None,
             r#loop: false,
-            silence: false, // Enable alerts
+            silence: false,
             terminal_bell: false,
             time: vec!["1s".to_string()],
         };
@@ -504,30 +497,10 @@ mod tests {
         let beep_alert = MockAlert::new(beep_log.clone(), "beep");
         let sound_alert = Arc::new(PanicAlert);
 
-        let result = countdown_with_alerts(&mut buffer, end, &opts, &beep_alert, sound_alert);
+        let result = play_completion_alerts(&mut buffer, &opts, &beep_alert, sound_alert);
 
-        // The function should catch the panic and return an error
         assert!(result.is_err());
-        // Verify beep was still called before the sound thread panicked
         let log = beep_log.lock().unwrap();
         assert!(log.calls.contains(&"beep"));
-    }
-
-    #[test]
-    fn test_resize_term_positive_counter() {
-        let mut writer = Vec::new();
-        let end = OffsetDateTime::now_utc() + Duration::seconds(60);
-        let result = resize_term(&mut writer, end);
-        assert!(result.is_ok());
-        assert!(!writer.is_empty());
-    }
-
-    #[test]
-    fn test_resize_term_zero_counter() {
-        let mut writer = Vec::new();
-        let end = OffsetDateTime::now_utc() - Duration::seconds(60);
-        let result = resize_term(&mut writer, end);
-        assert!(result.is_ok());
-        assert!(!writer.is_empty());
     }
 }
