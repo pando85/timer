@@ -50,7 +50,7 @@ pub fn parse_counter_time(s: &str) -> Option<Duration> {
 
 pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
     // Try to parse with hours, minutes, and seconds (with optional fractional seconds)
-    if let Ok(format) = format_description::parse("[hour]:[minute]:[second].[subsecond]")
+    if let Ok(format) = format_description::parse_borrowed::<3>("[hour]:[minute]:[second].[subsecond]")
         && let Ok(end_time) = Time::parse(s, &format)
     {
         let now = OffsetDateTime::now_local().ok()?;
@@ -62,7 +62,7 @@ pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
         };
         return Some(end_date.replace_time(end_time));
     }
-    if let Ok(format) = format_description::parse("[hour]:[minute]:[second]")
+    if let Ok(format) = format_description::parse_borrowed::<3>("[hour]:[minute]:[second]")
         && let Ok(end_time) = Time::parse(s, &format)
     {
         let now = OffsetDateTime::now_local().ok()?;
@@ -75,7 +75,7 @@ pub fn parse_end_time(s: &str) -> Option<OffsetDateTime> {
         return Some(end_date.replace_time(end_time));
     }
     // Fallback to [hour]:[minute]
-    let format = format_description::parse("[hour]:[minute]").ok()?;
+    let format = format_description::parse_borrowed::<3>("[hour]:[minute]").ok()?;
     let now = OffsetDateTime::now_local().ok()?;
     let end_time = Time::parse(s, &format)
         .or_else(|_| Time::parse(&format!("0{s}"), &format))
