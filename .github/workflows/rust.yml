@@ -67,7 +67,7 @@ jobs:
         shell: bash
         run: |
           case ${{ matrix.job.target }} in
-            x86_64-unknown-linux-gnu) sudo apt install -y libasound2-dev;;
+            x86_64-unknown-linux-gnu) sudo apt update && sudo apt install -y libasound2-dev;;
           esac
 
       - uses: Swatinem/rust-cache@v2
