@@ -132,16 +132,18 @@ yay -S timer-rs-bin
 
 Prebuilt binaries for supported Linux and macOS targets are attached to every [GitHub release](https://github.com/pando85/timer/releases).
 
-For example, on x86_64 Linux you can download and install the latest release with:
+You can download the latest release for your architecture with:
 
 ```bash
-url=$(curl -s https://api.github.com/repos/pando85/timer/releases/latest \
+curl -s https://api.github.com/repos/pando85/timer/releases/latest \
   | grep browser_download_url \
-  | grep 'x86_64-unknown-linux-gnu.tar.gz"' \
-  | cut -d '"' -f 4)
-
-curl -L "$url" | tar xz
-sudo install timer /usr/local/bin/timer
+  | grep -v sha256 \
+  | grep $(uname -m) \
+  | grep linux \
+  | cut -d '"' -f 4 \
+  | xargs curl -L \
+  | tar xvz
+sudo mv timer /usr/local/bin
 ```
 
 Release assets also include SHA-256 checksums.
