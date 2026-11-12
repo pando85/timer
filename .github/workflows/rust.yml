@@ -141,6 +141,7 @@ jobs:
           body: ${{ steps.changelog_reader.outputs.changes }}
           prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
           draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
+          fail_on_unmatched_files: true
           files: |
             ${{ steps.package.outputs.PKG_BASE_NAME }}.tar.gz
             ${{ steps.package.outputs.PKG_BASE_NAME }}.tar.gz.sha256
