@@ -5,7 +5,6 @@ authors = ["Pando85 <pando855@gmail.com>"]
 version = "0.11.4"
 edition = "2024"
 license-file = "./LICENSE"
-homepage = "https://github.com/pando85/timer"
 categories = ["command-line-utilities"]
 keywords = ["timer", "pomodoro", "countdown", "cli", "utility"]
 repository = "https://github.com/pando85/timer"
