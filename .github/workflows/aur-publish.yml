@@ -75,8 +75,7 @@ jobs:
         with:
           pkgname: ${{ matrix.package.name }}
           pkgbuild: ./${{ matrix.package.pkgbuild }}
-          assets: |
-            ${{ matrix.package.pkgbuild == 'PKGBUILD' && '.ci/keys' || '' }}
+          assets: ${{ matrix.package.pkgbuild == 'PKGBUILD' && '.ci/keys' || '' }}
           commit_username: ${{ secrets.AUR_USERNAME }}
           commit_email: ${{ secrets.AUR_EMAIL }}
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
