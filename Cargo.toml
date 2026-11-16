@@ -24,7 +24,7 @@ signal-hook = "0.4"
 time = { version = "0.3", features = ["formatting", "local-offset", "parsing"] }
 # beep
 libc = "0.2"
-nix = { version = "0.31", features = ["ioctl"] }
+nix = { version = "0.32", features = ["ioctl"] }
 
 [dev-dependencies]
 assert_cmd = "2"
